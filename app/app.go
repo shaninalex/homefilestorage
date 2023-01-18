@@ -2,6 +2,7 @@ package app
 
 import (
 	"homestorage/app/database"
+	"homestorage/app/restapi"
 
 	"gorm.io/gorm"
 )
@@ -18,4 +19,7 @@ func Run(conf *Config) {
 	db_connection := database.CreateDatabaseConnection(conf.Database)
 	app.DB = db_connection
 
+	// Run http server
+	// TODO: it should be running in goroutine with other app.
+	restapi.Server(app.DB)
 }
