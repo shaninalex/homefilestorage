@@ -1,9 +1,7 @@
 package app
 
 import (
-	"fmt"
-	"log"
-	"net/http"
+	"homestorage/app/database"
 
 	"gorm.io/gorm"
 )
@@ -12,15 +10,6 @@ type App struct {
 	DB *gorm.DB
 }
 
-func Run() {
-	mux := http.NewServeMux()
-	mux.HandleFunc("/", index)
-
-	err := http.ListenAndServe(":3000", mux)
-	log.Fatal(err)
-}
-
-func index(w http.ResponseWriter, r *http.Request) {
-
-	fmt.Fprintf(w, "index")
+func Run(conf *Config) {
+	database.CreateDatabaseConnection(conf.Database)
 }

@@ -28,6 +28,18 @@ CREATE TABLE "files"
 CREATE INDEX "files_name_idx" ON "files" ( "name" );
 
 
+CREATE TABLE "folders"
+(
+    "id" SERIAL PRIMARY KEY,
+    "name" CHAR(256) NOT NULL,
+    "color" CHAR(256) NOT NULL,
+    "owner" INTEGER NOT NULL,
+    "created_at" TIMESTAMP DEFAULT Now(),
+    FOREIGN KEY ("owner") REFERENCES "users" ("id") ON DELETE CASCADE
+);
+
+CREATE INDEX "folders_name_idx" ON "folders" ( "name" );
+
 -- BOOKSHELF
 CREATE TABLE "categories"
 (

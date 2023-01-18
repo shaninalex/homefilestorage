@@ -1,9 +1,15 @@
+# If DEBUG is TRUE - will using local sqlite3 database with 
+# If DEBUG empty or missing - PostgreSQL will be using 
 [Database]
-DB_HOST = 'localhost'
-DB_PORT = 5432
-DB_NAME = 'postgres'
-DB_USER = 'postgres'
-DB_PASS = 'postgres'
+DEBUG = 0
+DEBUG_NAME = 'database.db'
 
+HOST = 'localhost'
+PORT = 5432
+NAME = 'postgres'
+USER = 'postgres'
+PASS = 'postgres'
+
+# Default application port
 [Application]
-PORT = 8080
+PORT = 8000

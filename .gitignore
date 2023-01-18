@@ -16,3 +16,5 @@
 
 # configs
 config.toml
+
+database.db

@@ -1,0 +1,5 @@
+package filesystem
+
+func StorageModule() {
+
+}
