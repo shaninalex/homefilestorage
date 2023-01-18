@@ -13,8 +13,10 @@ func Server(db *gorm.DB, port int) {
 
 	router := bunrouter.New()
 
-	router.GET("/", RouteIndex)
-	router.POST("/api/v1/account/create/", RouteCreateUser)
+	h := Handlers(db)
+
+	router.GET("/", h.RouteIndex)
+	router.POST("/api/v1/account/create/", h.RouteCreateUser)
 
 	log.Printf("Start server under :%d port...", port)
 	http.ListenAndServe(fmt.Sprintf(":%d", port), router)
