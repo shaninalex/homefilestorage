@@ -1,16 +1,21 @@
 package restapi
 
 import (
+	"fmt"
+	"log"
 	"net/http"
 
+	"github.com/uptrace/bunrouter"
 	"gorm.io/gorm"
 )
 
-func Server(db *gorm.DB) {
+func Server(db *gorm.DB, port int) {
 
-	mux := http.NewServeMux()
+	router := bunrouter.New()
 
-	mux.HandleFunc("/", RouteIndex)
-	mux.HandleFunc("/api/v1/account/create/", RouteCreateUser)
+	router.GET("/", RouteIndex)
+	router.POST("/api/v1/account/create/", RouteCreateUser)
 
+	log.Printf("Start server under :%d port...", port)
+	http.ListenAndServe(fmt.Sprintf(":%d", port), router)
 }
