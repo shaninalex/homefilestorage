@@ -12,7 +12,7 @@ var conf DBConfig = DBConfig{
 	PASS:       "postgres",
 }
 
-func TestAdd(t *testing.T) {
+func TestPostgreSQLConnectionString(t *testing.T) {
 
 	got := buildConnectionUrl(&conf)
 	want := "host=localhost user=postgres password=postgres dbname=postgres port=5432 sslmode=disable"
