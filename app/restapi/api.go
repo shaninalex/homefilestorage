@@ -13,5 +13,4 @@ func Server(db *gorm.DB) {
 	mux.HandleFunc("/", RouteIndex)
 	mux.HandleFunc("/api/v1/account/create/", RouteCreateUser)
 
-	return
 }
