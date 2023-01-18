@@ -8,7 +8,8 @@ import (
 )
 
 type App struct {
-	DB *gorm.DB
+	DB     *gorm.DB
+	config *Config
 }
 
 var (
@@ -18,8 +19,8 @@ var (
 func Run(conf *Config) {
 	db_connection := database.CreateDatabaseConnection(conf.Database)
 	app.DB = db_connection
+	app.config = conf
 
 	// Run http server
-	// TODO: it should be running in goroutine with other app.
-	restapi.Server(app.DB)
+	restapi.Server(app.DB, app.config.Application.PORT)
 }
