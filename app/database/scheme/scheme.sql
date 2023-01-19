@@ -103,3 +103,7 @@ CREATE TABLE "access_log"
     FOREIGN KEY ("file_id") REFERENCES "files" ("id") ON DELETE CASCADE,
     FOREIGN KEY ("user_id") REFERENCES "users" ("id") ON DELETE CASCADE
 );
+
+-- TODO:
+--      - mock data
+--      - develop and create functions
