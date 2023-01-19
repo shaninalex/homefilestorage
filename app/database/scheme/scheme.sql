@@ -2,7 +2,7 @@
 CREATE TABLE "users"
 (
     "id" SERIAL PRIMARY KEY,
-    "email" CHAR(256) NOT NULL,
+    "email" CHAR(256) NOT NULL UNIQUE,
     "hashed_password" TEXT NOT NULL,
     "active" BOOLEAN NOT NULL DEFAULT true,
     "created_at" TIMESTAMP DEFAULT Now()

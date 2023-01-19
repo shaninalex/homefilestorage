@@ -41,7 +41,7 @@ func CreateDatabaseConnection(conf *DBConfig) *gorm.DB {
 
 	} else {
 		fmt.Println(buildConnectionUrl(conf))
-		db, err := gorm.Open(postgres.Open(buildConnectionUrl(conf)), &gorm.Config{SkipDefaultTransaction: true})
+		db, err := gorm.Open(postgres.Open(buildConnectionUrl(conf)), &gorm.Config{SkipDefaultTransaction: true, PrepareStmt: true})
 		if err != nil {
 			log.Fatalf("Cant connect to database: %s", err)
 			return nil
