@@ -104,6 +104,13 @@ CREATE TABLE "access_log"
     FOREIGN KEY ("user_id") REFERENCES "users" ("id") ON DELETE CASCADE
 );
 
+
+-- TOOD: videos
+-- This app will be able to store not only books, but also videos. Why?
+-- Because on my laptop I have 4-5 downloaded courses and it will be convinuent
+-- to store them to. May be I can create some streaming service to watch them from 
+-- device.
+
 -- TODO:
 --      - mock data
 --      - develop and create functions
