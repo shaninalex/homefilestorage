@@ -2,6 +2,8 @@ package restapi
 
 import (
 	"encoding/json"
+	"fmt"
+	"homestorage/app/database"
 	"io"
 	"net/http"
 
@@ -46,7 +48,6 @@ func (h *BaseHandler) RouteCreateUser(w http.ResponseWriter, req bunrouter.Reque
 		return nil
 	}
 
-	// p := createUserRequestPayload{Email: "email@test.com", Password: "123", Password_confirm: "123"}
 	p := createUserRequestPayload{}
 	json.Unmarshal(data, &p)
 
@@ -62,10 +63,12 @@ func (h *BaseHandler) RouteCreateUser(w http.ResponseWriter, req bunrouter.Reque
 	w.WriteHeader(http.StatusCreated)
 	json.NewEncoder(w).Encode(p)
 
+	fmt.Println("this is test message")
+
 	// - validate request
-	// payload := database.CreateUserPayload{Email: "test@test.com", HashedPassword: "secret"}
+	payload := database.CreateUserPayload{Email: p.Email, HashedPassword: p.Password}
 	// - save user
-	// database.CreateUser(&payload, h.db)
+	database.CreateUser(&payload, h.db)
 
 	// RabbitMQ
 	// - send email to admin ( new user created )

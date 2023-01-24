@@ -14,6 +14,11 @@ Developer documentation and tasks will be soon.
 # start infrastructure
 $ docker compose up -d --build
 
+
+# Create database scheme
+$ docker exec homefilestorage-db-1 psql -h localhost -d postgres -U postgres -p 5432 -a -w -f ./app/database/scheme/scheme.sql
+
+
 # start project
 $ go run . -config=config.example.toml
 ```
