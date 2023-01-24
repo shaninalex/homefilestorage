@@ -1,6 +1,9 @@
 package database
 
 import (
+	"homestorage/app/utils"
+	"log"
+
 	"gorm.io/gorm"
 )
 
@@ -14,7 +17,12 @@ func GetUser(id int, db *gorm.DB) {
 }
 
 func CreateUser(payload *CreateUserPayload, db *gorm.DB) {
-	db.Exec("INSERT INTO users (email, hashed_password) VALUES (?, ?);", payload.Email, payload.HashedPassword)
+	encodedHash, err := utils.GenerateFromPassword(payload.HashedPassword)
+
+	if err != nil {
+		log.Fatal(err)
+	}
+	db.Exec("INSERT INTO users (email, hashed_password) VALUES (?, ?);", payload.Email, encodedHash)
 }
 
 // TODO
