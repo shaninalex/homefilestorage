@@ -1,15 +1,22 @@
 package restapi
 
 import (
-	"database/sql"
+	"errors"
 	"fmt"
+	"homestorage/app/database"
 	"log"
 	"net/http"
 
 	"github.com/uptrace/bunrouter"
 )
 
-func Server(db *sql.DB, port int) {
+// TODO i18n errors texts
+var (
+	ErrParse                       = errors.New("cannot parse request")
+	ErrRegistrationPasswordConfirm = errors.New("password and password confirm are not the same")
+)
+
+func Server(db *database.DatabaseRepository, port int) {
 
 	router := bunrouter.New()
 

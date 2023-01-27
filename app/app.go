@@ -1,13 +1,13 @@
 package app
 
 import (
-	"database/sql"
 	"homestorage/app/database"
 	"homestorage/app/restapi"
+	"log"
 )
 
 type App struct {
-	DB     *sql.DB
+	DB     *database.DatabaseRepository
 	config *Config
 }
 
@@ -16,8 +16,15 @@ var (
 )
 
 func Run(conf *Config) {
-	db_connection := database.CreateDatabaseConnection(conf.Database)
-	app.DB = db_connection
+	db, err := database.CreateDatabaseConnection(conf.Database)
+	if err != nil {
+		log.Fatal(err)
+	}
+	err = db.Migrate()
+	if err != nil {
+		log.Fatal(err)
+	}
+	app.DB = db
 	app.config = conf
 
 	// Run http server

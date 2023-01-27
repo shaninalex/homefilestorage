@@ -1,30 +1,18 @@
 package restapi
 
 import (
-	"database/sql"
 	"encoding/json"
-	"fmt"
 	"homestorage/app/database"
+	"homestorage/app/utils"
 	"io"
+	"log"
 	"net/http"
 
 	"github.com/uptrace/bunrouter"
 )
 
 type BaseHandler struct {
-	db *sql.DB
-}
-
-func Handlers(db *sql.DB) *BaseHandler {
-	return &BaseHandler{
-		db: db,
-	}
-}
-
-func (h *BaseHandler) RouteIndex(w http.ResponseWriter, req bunrouter.Request) error {
-	w.WriteHeader(http.StatusOK)
-	w.Write([]byte("Read documentation..."))
-	return nil
+	db *database.DatabaseRepository
 }
 
 type createUserRequestPayload struct {
@@ -37,38 +25,45 @@ type ErrorResponse struct {
 	Errors []string `json:"errors"`
 }
 
+func Handlers(db *database.DatabaseRepository) *BaseHandler {
+	return &BaseHandler{
+		db: db,
+	}
+}
+
+func (h *BaseHandler) RouteIndex(w http.ResponseWriter, req bunrouter.Request) error {
+	w.WriteHeader(http.StatusOK)
+	w.Write([]byte("Read documentation..."))
+	return nil
+}
+
 func (h *BaseHandler) RouteCreateUser(w http.ResponseWriter, req bunrouter.Request) error {
 
 	data, err := io.ReadAll(req.Body)
 	if err != nil {
-		error_data := ErrorResponse{Errors: []string{"Cannot parse request"}}
-		w.Header().Set("Content-Type", "application/json")
-		w.WriteHeader(http.StatusCreated)
-		json.NewEncoder(w).Encode(error_data)
-		return nil
+		return ErrParse
 	}
 
 	p := createUserRequestPayload{}
 	json.Unmarshal(data, &p)
 
 	if p.Password != p.PasswordConfirm {
-		error_data := ErrorResponse{Errors: []string{"Password and password confirm are not the same."}}
-		w.Header().Set("Content-Type", "application/json")
-		w.WriteHeader(http.StatusCreated)
-		json.NewEncoder(w).Encode(error_data)
-		return nil
+		return ErrRegistrationPasswordConfirm
 	}
 
 	w.Header().Set("Content-Type", "application/json")
 	w.WriteHeader(http.StatusCreated)
 	json.NewEncoder(w).Encode(p)
 
-	fmt.Println("this is test message")
-
 	// - validate request
 	payload := database.CreateUserPayload{Email: p.Email, HashedPassword: p.Password}
 	// - save user
-	database.CreateUser(&payload, h.db)
+	encodedHash, err := utils.GenerateFromPassword(payload.HashedPassword)
+	if err != nil {
+		log.Fatal(err)
+	}
+	payload.HashedPassword = encodedHash
+	h.db.CreateUser(&payload)
 
 	// RabbitMQ
 	// - send email to admin ( new user created )
