@@ -1,15 +1,15 @@
 package restapi
 
 import (
+	"database/sql"
 	"fmt"
 	"log"
 	"net/http"
 
 	"github.com/uptrace/bunrouter"
-	"gorm.io/gorm"
 )
 
-func Server(db *gorm.DB, port int) {
+func Server(db *sql.DB, port int) {
 
 	router := bunrouter.New()
 

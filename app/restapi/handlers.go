@@ -1,6 +1,7 @@
 package restapi
 
 import (
+	"database/sql"
 	"encoding/json"
 	"fmt"
 	"homestorage/app/database"
@@ -8,14 +9,13 @@ import (
 	"net/http"
 
 	"github.com/uptrace/bunrouter"
-	"gorm.io/gorm"
 )
 
 type BaseHandler struct {
-	db *gorm.DB
+	db *sql.DB
 }
 
-func Handlers(db *gorm.DB) *BaseHandler {
+func Handlers(db *sql.DB) *BaseHandler {
 	return &BaseHandler{
 		db: db,
 	}
