@@ -1,14 +1,13 @@
 package app
 
 import (
+	"database/sql"
 	"homestorage/app/database"
 	"homestorage/app/restapi"
-
-	"gorm.io/gorm"
 )
 
 type App struct {
-	DB     *gorm.DB
+	DB     *sql.DB
 	config *Config
 }
 
