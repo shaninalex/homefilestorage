@@ -24,6 +24,7 @@ func Server(db *database.DatabaseRepository, port int) {
 
 	router.GET("/", h.RouteIndex)
 	router.POST("/api/v1/account/create/", h.RouteCreateUser)
+	router.POST("/api/v1/account/login/", h.RouteLoginUser)
 
 	log.Printf("Start server under :%d port...", port)
 	http.ListenAndServe(fmt.Sprintf(":%d", port), router)

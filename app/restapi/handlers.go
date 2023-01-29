@@ -2,6 +2,7 @@ package restapi
 
 import (
 	"encoding/json"
+	"errors"
 	"homestorage/app/database"
 	"homestorage/app/utils"
 	"io"
@@ -19,6 +20,11 @@ type createUserRequestPayload struct {
 	Email           string `json:"email"`
 	Password        string `json:"password"`
 	PasswordConfirm string `json:"password_confirm"`
+}
+
+type loginUserRequestPayload struct {
+	Email    string `json:"email"`
+	Password string `json:"password"`
 }
 
 type ErrorResponse struct {
@@ -63,10 +69,48 @@ func (h *BaseHandler) RouteCreateUser(w http.ResponseWriter, req bunrouter.Reque
 		log.Fatal(err)
 	}
 	payload.HashedPassword = encodedHash
-	h.db.CreateUser(&payload)
+	err = h.db.CreateUser(&payload)
+	if err != nil {
+		log.Fatal(err)
+	}
 
 	// RabbitMQ
 	// - send email to admin ( new user created )
 	// - send email to new user ( confirm your account )
+	return nil
+}
+
+func (h *BaseHandler) RouteLoginUser(w http.ResponseWriter, req bunrouter.Request) error {
+	data, err := io.ReadAll(req.Body)
+	if err != nil {
+		return ErrParse
+	}
+
+	p := loginUserRequestPayload{}
+	json.Unmarshal(data, &p)
+
+	user, err := h.db.GetUserByEmail(p.Email)
+	if err != nil {
+		return err
+	}
+
+	match, err := utils.CheckPassword(p.Password, user.Hashed_password)
+	if err != nil {
+		return err
+	}
+
+	if !match {
+		return errors.New("password does not match")
+	}
+
+	token, err := utils.GenerateJWT(user.Email, user.Id)
+	if err != nil {
+		return err
+	}
+
+	w.Header().Set("Content-Type", "application/json")
+	w.WriteHeader(http.StatusCreated)
+	json.NewEncoder(w).Encode(token)
+
 	return nil
 }

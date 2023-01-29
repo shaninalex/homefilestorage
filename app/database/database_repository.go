@@ -52,28 +52,27 @@ func (r *DatabaseRepository) Migrate() error {
 
 func (r *DatabaseRepository) GetUser(id int) (*User, error) {
 	var user User
-	row := r.db.QueryRow("SELECT id, email, active, created_at FROM users WHERE id=?;", id)
-	err := row.Scan(
-		&user.Id,
-		&user.Email,
-		&user.Active,
-		&user.Created_at,
-	)
+	row := r.db.QueryRow("SELECT id, email, active, hashed_password, created_at FROM users WHERE id=?;", id)
+	err := row.Scan(&user.Id, &user.Email, &user.Active, &user.Hashed_password, &user.Created_at)
 	if err != nil {
 		return nil, err
 	}
 	return &user, nil
 }
 
-func (r *DatabaseRepository) GetUserByEmail(email string) (User, error) {
+func (r *DatabaseRepository) GetUserByEmail(email string) (*User, error) {
 	var user User
-	r.db.QueryRow("SELECT * FROM users WHERE email=?;", email).Scan(&user)
-	return user, nil
+	row := r.db.QueryRow("SELECT id, email, active, hashed_password, created_at FROM users WHERE email=?;", email)
+	err := row.Scan(&user.Id, &user.Email, &user.Active, &user.Hashed_password, &user.Created_at)
+	if err != nil {
+		return nil, err
+	}
+	return &user, nil
 }
 
 func (r *DatabaseRepository) CreateUser(payload *CreateUserPayload) error {
 	// TODO: Remove generating password hash from database package!
-	query := "INSERT INTO users (email, hashed_password) VALUES (?, ?) RETURNING id, email, hashed_password, active, created_at;"
+	query := "INSERT INTO users (email, hashed_password) VALUES (?, ?) RETURNING id;"
 	_, err := r.db.Exec(query, payload.Email, payload.HashedPassword)
 	if err != nil {
 		return err
