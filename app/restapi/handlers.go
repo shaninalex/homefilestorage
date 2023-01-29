@@ -2,7 +2,6 @@ package restapi
 
 import (
 	"encoding/json"
-	"errors"
 	"homestorage/app/database"
 	"homestorage/app/utils"
 	"io"
@@ -25,6 +24,10 @@ type createUserRequestPayload struct {
 type loginUserRequestPayload struct {
 	Email    string `json:"email"`
 	Password string `json:"password"`
+}
+
+type RefreshToken struct {
+	Access string `json:"access"`
 }
 
 type ErrorResponse struct {
@@ -100,7 +103,7 @@ func (h *BaseHandler) RouteLoginUser(w http.ResponseWriter, req bunrouter.Reques
 	}
 
 	if !match {
-		return errors.New("password does not match")
+		return ErrPasswordDoesNotMatch
 	}
 
 	token, err := utils.GenerateJWT(user.Email, user.Id)
@@ -112,5 +115,25 @@ func (h *BaseHandler) RouteLoginUser(w http.ResponseWriter, req bunrouter.Reques
 	w.WriteHeader(http.StatusCreated)
 	json.NewEncoder(w).Encode(token)
 
+	return nil
+}
+
+func (h *BaseHandler) RouteRefreshToken(w http.ResponseWriter, req bunrouter.Request) error {
+	data, err := io.ReadAll(req.Body)
+	if err != nil {
+		return ErrParse
+	}
+
+	p := RefreshToken{}
+	json.Unmarshal(data, &p)
+
+	access_credentials, err := utils.RefreshJWT(p.Access)
+	if err != nil {
+		return ErrCantRafreshToken
+	}
+
+	w.Header().Set("Content-Type", "application/json")
+	w.WriteHeader(http.StatusCreated)
+	json.NewEncoder(w).Encode(access_credentials)
 	return nil
 }
