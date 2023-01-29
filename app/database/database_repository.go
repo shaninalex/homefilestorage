@@ -50,9 +50,9 @@ func (r *DatabaseRepository) Migrate() error {
 	return nil
 }
 
-func (r *DatabaseRepository) GetUser(id int) (*User, error) {
+func (r *DatabaseRepository) GetUser(id *int) (*User, error) {
 	var user User
-	row := r.db.QueryRow("SELECT id, email, active, hashed_password, created_at FROM users WHERE id=?;", id)
+	row := r.db.QueryRow("SELECT id, email, active, hashed_password, created_at FROM users WHERE id=?;", &id)
 	err := row.Scan(&user.Id, &user.Email, &user.Active, &user.Hashed_password, &user.Created_at)
 	if err != nil {
 		return nil, err
