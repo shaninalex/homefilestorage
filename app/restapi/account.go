@@ -7,13 +7,10 @@ import (
 	"io"
 	"log"
 	"net/http"
+	"strings"
 
 	"github.com/uptrace/bunrouter"
 )
-
-type BaseHandler struct {
-	db *database.DatabaseRepository
-}
 
 type createUserRequestPayload struct {
 	Email           string `json:"email"`
@@ -32,12 +29,6 @@ type RefreshToken struct {
 
 type ErrorResponse struct {
 	Errors []string `json:"errors"`
-}
-
-func Handlers(db *database.DatabaseRepository) *BaseHandler {
-	return &BaseHandler{
-		db: db,
-	}
 }
 
 func (h *BaseHandler) RouteIndex(w http.ResponseWriter, req bunrouter.Request) error {
@@ -135,5 +126,23 @@ func (h *BaseHandler) RouteRefreshToken(w http.ResponseWriter, req bunrouter.Req
 	w.Header().Set("Content-Type", "application/json")
 	w.WriteHeader(http.StatusCreated)
 	json.NewEncoder(w).Encode(access_credentials)
+	return nil
+}
+
+func (h *BaseHandler) RouteGetAccount(w http.ResponseWriter, req bunrouter.Request) error {
+	token := req.Header.Get("Authorization")
+	_, id, err := utils.IdentifyJWT(strings.Replace(token, "Bearer ", "", 1))
+	if err != nil {
+		return err
+	}
+
+	user, err := h.db.GetUser(id)
+	if err != nil {
+		return err
+	}
+
+	w.Header().Set("Content-Type", "application/json")
+	w.WriteHeader(http.StatusCreated)
+	json.NewEncoder(w).Encode(user)
 	return nil
 }
