@@ -85,3 +85,25 @@ func RefreshJWT(refresh string) (*AccessCredentials, error) {
 
 	return GenerateJWT(claims.Username, claims.Sub)
 }
+
+func IdentifyJWT(token string) (*string, *int, error) {
+	claims := &Claims{}
+	tkn, err := jwt.ParseWithClaims(token, claims, func(token *jwt.Token) (interface{}, error) {
+		return claims.Username, nil
+	})
+	if err != nil {
+		if err == jwt.ErrSignatureInvalid {
+			return nil, nil, ErrWrongSignature
+		}
+		return nil, nil, err
+	}
+	if !tkn.Valid {
+		return nil, nil, ErrTokenIsInvalid
+	}
+
+	if time.Until(claims.ExpiresAt.Time) > 30*time.Second {
+		return nil, nil, ErrTokenIsExpired
+	}
+
+	return &claims.Username, &claims.Sub, nil
+}
