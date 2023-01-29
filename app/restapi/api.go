@@ -10,6 +10,16 @@ import (
 	"github.com/uptrace/bunrouter"
 )
 
+type BaseHandler struct {
+	db *database.DatabaseRepository
+}
+
+func Handlers(db *database.DatabaseRepository) *BaseHandler {
+	return &BaseHandler{
+		db: db,
+	}
+}
+
 // TODO i18n errors texts
 var (
 	ErrParse                       = errors.New("cannot parse request")
@@ -25,9 +35,12 @@ func Server(db *database.DatabaseRepository, port int) {
 	h := Handlers(db)
 
 	router.GET("/", h.RouteIndex)
+	router.POST("/api/v1/account/", h.RouteGetAccount)
 	router.POST("/api/v1/account/create/", h.RouteCreateUser)
 	router.POST("/api/v1/account/login/", h.RouteLoginUser)
 	router.POST("/api/v1/account/refresh/", h.RouteRefreshToken)
+
+	// router.POST("/api/v1/files/upload/")
 
 	log.Printf("Start server under :%d port...", port)
 	http.ListenAndServe(fmt.Sprintf(":%d", port), router)
