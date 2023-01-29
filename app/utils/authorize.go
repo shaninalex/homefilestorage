@@ -89,7 +89,7 @@ func RefreshJWT(refresh string) (*AccessCredentials, error) {
 func IdentifyJWT(token string) (*string, *int, error) {
 	claims := &Claims{}
 	tkn, err := jwt.ParseWithClaims(token, claims, func(token *jwt.Token) (interface{}, error) {
-		return claims.Username, nil
+		return jwtKey, nil
 	})
 	if err != nil {
 		if err == jwt.ErrSignatureInvalid {

@@ -8,4 +8,5 @@ import (
 
 func (h *BaseHandler) SaveFile(w http.ResponseWriter, req bunrouter.Request) error {
 
+	return nil
 }
