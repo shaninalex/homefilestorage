@@ -1,7 +1,7 @@
 -- SYSTEM
 CREATE TABLE IF NOT EXISTS "users"
 (
-    "id" SERIAL PRIMARY KEY,
+    "id" INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL,
     "email" CHAR(256) NOT NULL UNIQUE,
     "hashed_password" TEXT NOT NULL,
     "active" BOOLEAN NOT NULL DEFAULT true,
@@ -13,7 +13,7 @@ CREATE INDEX IF NOT EXISTS "users_email_idx" ON "users" ( "email" );
 
 CREATE TABLE IF NOT EXISTS "files"
 (
-    "id" SERIAL PRIMARY KEY,
+    "id" INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL,
     "name" CHAR(256) NOT NULL UNIQUE,
     "mime_type" CHAR(128) NOT NULL,
     "size" INTEGER NOT NULL,
@@ -30,7 +30,7 @@ CREATE INDEX IF NOT EXISTS "files_name_idx" ON "files" ( "name" );
 
 CREATE TABLE IF NOT EXISTS "folders"
 (
-    "id" SERIAL PRIMARY KEY,
+    "id" INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL,
     "name" CHAR(256) NOT NULL,
     "color" CHAR(256) NOT NULL,
     "owner" INTEGER NOT NULL,
@@ -53,7 +53,7 @@ CREATE INDEX IF NOT EXISTS "categories_category_name_idx" ON "categories" ( "cat
 
 CREATE TABLE IF NOT EXISTS "books"
 (
-    "id" SERIAL PRIMARY KEY,
+    "id" INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL,
     "name" CHAR(256) NOT NULL,
     "year" INTEGER,
     "publisher_id" INTEGER,
@@ -76,7 +76,7 @@ CREATE TABLE IF NOT EXISTS "books_categories"
 
 CREATE TABLE IF NOT EXISTS "authors"
 (
-    "id" SERIAL PRIMARY KEY,
+    "id" INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL,
     "fullname" CHAR(256) NOT NULL,
     "birthday" INTEGER,
     "death" INTEGER,

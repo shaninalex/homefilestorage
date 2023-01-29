@@ -1,5 +1,5 @@
 [Database]
-DB_ENGINE = 'sqlite'
+DB_ENGINE = 'sqlite3'
 DB_PATH = "./database.db"
 # DB_PATH = "host=localhost user=postgres password=postgres dbname=postgres port=5432 sslmode=disable"
 
