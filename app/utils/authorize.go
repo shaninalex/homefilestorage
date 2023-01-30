@@ -101,7 +101,7 @@ func IdentifyJWT(token string) (*string, *int, error) {
 		return nil, nil, ErrTokenIsInvalid
 	}
 
-	if time.Until(claims.ExpiresAt.Time) > 30*time.Second {
+	if time.Until(claims.ExpiresAt.Time) > 5*time.Minute {
 		return nil, nil, ErrTokenIsExpired
 	}
 
