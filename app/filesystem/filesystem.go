@@ -15,6 +15,7 @@ import (
 
 func SaveFileToStorage(file multipart.File, fileHeader *multipart.FileHeader) (*string, *string, error) {
 
+	// TODO: this function does not save file content...
 	ext1 := filepath.Ext(fileHeader.Filename)
 	new_generated_name := uuid.New().String() + ext1
 

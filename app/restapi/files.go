@@ -53,6 +53,7 @@ func (h *BaseHandler) RouteSaveFile(w http.ResponseWriter, req bunrouter.Request
 		Public:     true,
 	}
 
+	// TODO: does not return file id
 	new_file_id, err := h.db.SaveFileRecord(&file)
 
 	if err != nil {
