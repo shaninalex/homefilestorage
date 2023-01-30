@@ -19,7 +19,7 @@ type File struct {
 var (
 	MAX_FILE_SIZE = 314572800 // 300Mb ( NOTE: This constant can be in configuration files )
 
-	ALLOWED_FILE_TYPES = [18]string{
+	ALLOWED_FILE_TYPES = [19]string{
 
 		// DOCUMENTS and PRESENTATIONS
 		"application/msword", // .doc
@@ -30,6 +30,7 @@ var (
 		"application/vnd.oasis.opendocument.spreadsheet",                            // .ods
 		"application/vnd.oasis.opendocument.text",                                   // .odt
 		"application/rtf",
+		"application/pdf", // .pdf
 		"text/plain",
 
 		// IMAGES

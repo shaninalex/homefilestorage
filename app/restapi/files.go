@@ -1,6 +1,7 @@
 package restapi
 
 import (
+	"encoding/json"
 	"homestorage/app/filesystem"
 	"homestorage/app/utils"
 	"io"
@@ -45,15 +46,23 @@ func (h *BaseHandler) RouteSaveFile(w http.ResponseWriter, req bunrouter.Request
 		Owner:      *id,
 		MimeType:   file_type,
 		Size:       int(fileHeader.Size),
-		SystemPath: systemPath,
-		Hash:       hash,
+		SystemPath: *systemPath,
+		Hash:       *hash,
+		Name:       fileHeader.Filename,
+		Public:     true,
 	}
 
-	err = h.db.SaveFileRecord(&file)
+	new_file_id, err := h.db.SaveFileRecord(&file)
 
 	if err != nil {
 		return err
 	}
+
+	file.Id = new_file_id
+
+	w.Header().Set("Content-Type", "application/json")
+	w.WriteHeader(http.StatusCreated)
+	json.NewEncoder(w).Encode(file)
 
 	return nil
 }
