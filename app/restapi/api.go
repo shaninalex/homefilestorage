@@ -53,7 +53,7 @@ var (
 
 func Server(db *database.DatabaseRepository, port int) {
 
-	router := bunrouter.New()
+	router := bunrouter.New(bunrouter.Use(ErrorHandler))
 
 	h := Handlers(db)
 
