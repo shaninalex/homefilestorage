@@ -2,7 +2,6 @@ package database
 
 import (
 	"database/sql"
-	"fmt"
 	"homestorage/app/utils"
 	"io"
 	"log"
@@ -88,7 +87,7 @@ func (r *DatabaseRepository) SaveFileRecord(payload *utils.File) (int, error) {
 		INSERT INTO files 
 			(name, mime_type, size, system_path, owner, hash, public) 
 		VALUES (?, ?, ?, ?, ?, ?, ?) RETURNING id;`
-	row, err := r.db.Exec(query,
+	_, err := r.db.Exec(query,
 		payload.Name,
 		payload.MimeType,
 		payload.Size,
@@ -97,13 +96,46 @@ func (r *DatabaseRepository) SaveFileRecord(payload *utils.File) (int, error) {
 		payload.Hash,
 		payload.Public,
 	)
-	fmt.Println(row)
 	if err != nil {
 		return 0, err
 	}
 	return id, nil
 }
 
-func (r *DatabaseRepository) GetScreenListData(id int) (*utils.FilesListResponse, error) {
-	return nil, nil
+func (r *DatabaseRepository) GetScreenListData(parent_id int, owner_id int) (*utils.FilesListResponse, error) {
+	response := utils.FilesListResponse{}
+	var rows *sql.Rows
+	var err error
+	if parent_id != 0 {
+		query := `SELECT id, name, mime_type, size 
+					FROM files 
+					WHERE folder=? AND owner=?;`
+		rows, err = r.db.Query(query, parent_id, owner_id)
+		if err != nil {
+			return nil, err
+		}
+	} else {
+		query := `SELECT id, name, mime_type, size 
+					FROM files 
+					WHERE folder IS NULL AND owner=?;`
+		rows, err = r.db.Query(query, owner_id)
+		if err != nil {
+			return nil, err
+		}
+	}
+	for rows.Next() {
+		file := utils.File{}
+		err := rows.Scan(
+			&file.Id,
+			&file.Name,
+			&file.MimeType,
+			&file.Size,
+		)
+		if err != nil {
+			return nil, err
+		}
+		response.Files = append(response.Files, file)
+	}
+
+	return &response, nil
 }
