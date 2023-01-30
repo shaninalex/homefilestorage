@@ -10,6 +10,29 @@ import (
 	"github.com/uptrace/bunrouter"
 )
 
+type createUserRequestPayload struct {
+	Email           string `json:"email"`
+	Password        string `json:"password"`
+	PasswordConfirm string `json:"password_confirm"`
+}
+
+type loginUserRequestPayload struct {
+	Email    string `json:"email"`
+	Password string `json:"password"`
+}
+
+type RefreshToken struct {
+	Access string `json:"access"`
+}
+
+type ErrorResponse struct {
+	Errors []string `json:"errors"`
+}
+
+type BooleanResponse struct {
+	Status bool `json:"status"`
+}
+
 type BaseHandler struct {
 	db *database.DatabaseRepository
 }
@@ -35,7 +58,7 @@ func Server(db *database.DatabaseRepository, port int) {
 	h := Handlers(db)
 
 	router.GET("/", h.RouteIndex)
-	router.POST("/api/v1/account/", h.RouteGetAccount)
+	router.GET("/api/v1/account/", h.RouteGetAccount)
 	router.POST("/api/v1/account/create/", h.RouteCreateUser)
 	router.POST("/api/v1/account/login/", h.RouteLoginUser)
 	router.POST("/api/v1/account/refresh/", h.RouteRefreshToken)

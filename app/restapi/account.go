@@ -5,31 +5,11 @@ import (
 	"homestorage/app/database"
 	"homestorage/app/utils"
 	"io"
-	"log"
 	"net/http"
 	"strings"
 
 	"github.com/uptrace/bunrouter"
 )
-
-type createUserRequestPayload struct {
-	Email           string `json:"email"`
-	Password        string `json:"password"`
-	PasswordConfirm string `json:"password_confirm"`
-}
-
-type loginUserRequestPayload struct {
-	Email    string `json:"email"`
-	Password string `json:"password"`
-}
-
-type RefreshToken struct {
-	Access string `json:"access"`
-}
-
-type ErrorResponse struct {
-	Errors []string `json:"errors"`
-}
 
 func (h *BaseHandler) RouteIndex(w http.ResponseWriter, req bunrouter.Request) error {
 	w.WriteHeader(http.StatusOK)
@@ -51,22 +31,22 @@ func (h *BaseHandler) RouteCreateUser(w http.ResponseWriter, req bunrouter.Reque
 		return ErrRegistrationPasswordConfirm
 	}
 
-	w.Header().Set("Content-Type", "application/json")
-	w.WriteHeader(http.StatusCreated)
-	json.NewEncoder(w).Encode(p)
-
 	// - validate request
 	payload := database.CreateUserPayload{Email: p.Email, HashedPassword: p.Password}
 	// - save user
 	encodedHash, err := utils.GenerateFromPassword(payload.HashedPassword)
 	if err != nil {
-		log.Fatal(err)
+		return err
 	}
 	payload.HashedPassword = encodedHash
 	err = h.db.CreateUser(&payload)
 	if err != nil {
-		log.Fatal(err)
+		return err
 	}
+
+	w.Header().Set("Content-Type", "application/json")
+	w.WriteHeader(http.StatusCreated)
+	json.NewEncoder(w).Encode(&BooleanResponse{Status: true})
 
 	// RabbitMQ
 	// - send email to admin ( new user created )
@@ -143,6 +123,6 @@ func (h *BaseHandler) RouteGetAccount(w http.ResponseWriter, req bunrouter.Reque
 
 	w.Header().Set("Content-Type", "application/json")
 	w.WriteHeader(http.StatusCreated)
-	json.NewEncoder(w).Encode(user)
+	json.NewEncoder(w).Encode(utils.PublicUser(user))
 	return nil
 }
