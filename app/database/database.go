@@ -19,11 +19,11 @@ type CreateUserPayload struct {
 }
 
 type User struct {
-	Id              int
-	Email           string
-	Hashed_password string
-	Active          bool
-	Created_at      *time.Time
+	Id              int        `json:"id"`
+	Email           string     `json:"email"`
+	Hashed_password string     `json:"password"`
+	Active          bool       `json:"active"`
+	Created_at      *time.Time `json:"created_at"`
 }
 
 type DBConfig struct {
