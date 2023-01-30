@@ -21,3 +21,6 @@ database.db
 
 # build binary
 homestorage
+
+# System file storage
+./tmp/*

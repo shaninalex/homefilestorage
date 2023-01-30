@@ -5,3 +5,6 @@ DB_PATH = "./database.db"
 
 [Application]
 PORT = 8080
+
+[FileStorage]
+SYSTEM_PATH = './tmp/storage/'
