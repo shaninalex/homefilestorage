@@ -2,6 +2,7 @@ package database
 
 import (
 	"database/sql"
+	"homestorage/app/filesystem"
 	"io"
 	"log"
 	"os"
@@ -74,6 +75,26 @@ func (r *DatabaseRepository) CreateUser(payload *CreateUserPayload) error {
 	// TODO: Remove generating password hash from database package!
 	query := "INSERT INTO users (email, hashed_password) VALUES (?, ?) RETURNING id;"
 	_, err := r.db.Exec(query, payload.Email, payload.HashedPassword)
+	if err != nil {
+		return err
+	}
+	return nil
+}
+
+func (r *DatabaseRepository) SaveFileRecord(payload *filesystem.File) error {
+	// TODO: Remove generating password hash from database package!
+	query := `
+		INSERT INTO files 
+			(name, mime_type, size, system_path, owner, hash) 
+		VALUES (?, ?, ?, ?, ?, ?, ?) RETURNING id;`
+	_, err := r.db.Exec(query,
+		payload.Id,
+		payload.MimeType,
+		payload.Size,
+		payload.SystemPath,
+		payload.Owner,
+		payload.Hash,
+	)
 	if err != nil {
 		return err
 	}

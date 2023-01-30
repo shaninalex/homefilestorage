@@ -19,6 +19,7 @@ CREATE TABLE IF NOT EXISTS "files"
     "size" INTEGER NOT NULL,
     "system_path" CHAR(256),
     "owner" INTEGER NOT NULL,
+    "hash" TEXT NOT NULL,
     "public" BOOLEAN NOT NULL DEFAULT true,
     "created_at" DATETIME DEFAULT current_timestamp
     CHECK ("size" > 0),
