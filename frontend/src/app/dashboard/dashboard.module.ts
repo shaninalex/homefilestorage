@@ -4,11 +4,15 @@ import { HTTP_INTERCEPTORS } from '@angular/common/http';
 import { AuthInterceptor } from '../shared/auth.interceptor';
 import { DashboardComponent } from './dashboard.component';
 import { DashboardRoutingModule } from './dashboard-routing.module';
+import { SidebarComponent } from './layout/sidebar/sidebar.component';
+import { HeaderComponent } from './layout/header/header.component';
 
 
 @NgModule({
     declarations: [
-        DashboardComponent
+        DashboardComponent,
+        SidebarComponent, 
+        HeaderComponent
     ],
     imports: [
         CommonModule,
