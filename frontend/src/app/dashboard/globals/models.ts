@@ -7,3 +7,11 @@ export interface User {
     phone: string
     password?: string
 }
+
+export interface FileItem {
+    id?: number
+    name: string
+    size: number
+    modified: Date
+    public: boolean
+}
