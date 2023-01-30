@@ -2,6 +2,7 @@ package database
 
 import (
 	"database/sql"
+	"fmt"
 	"homestorage/app/filesystem"
 	"io"
 	"log"
@@ -81,22 +82,24 @@ func (r *DatabaseRepository) CreateUser(payload *CreateUserPayload) error {
 	return nil
 }
 
-func (r *DatabaseRepository) SaveFileRecord(payload *filesystem.File) error {
-	// TODO: Remove generating password hash from database package!
+func (r *DatabaseRepository) SaveFileRecord(payload *filesystem.File) (int, error) {
+	var id int
 	query := `
 		INSERT INTO files 
-			(name, mime_type, size, system_path, owner, hash) 
+			(name, mime_type, size, system_path, owner, hash, public) 
 		VALUES (?, ?, ?, ?, ?, ?, ?) RETURNING id;`
-	_, err := r.db.Exec(query,
-		payload.Id,
+	row, err := r.db.Exec(query,
+		payload.Name,
 		payload.MimeType,
 		payload.Size,
 		payload.SystemPath,
 		payload.Owner,
 		payload.Hash,
+		payload.Public,
 	)
+	fmt.Println(row)
 	if err != nil {
-		return err
+		return 0, err
 	}
-	return nil
+	return id, nil
 }

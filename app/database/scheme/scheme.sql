@@ -14,7 +14,7 @@ CREATE INDEX IF NOT EXISTS "users_email_idx" ON "users" ( "email" );
 CREATE TABLE IF NOT EXISTS "files"
 (
     "id" INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL,
-    "name" CHAR(256) NOT NULL UNIQUE,
+    "name" CHAR(256) NOT NULL,
     "mime_type" CHAR(128) NOT NULL,
     "size" INTEGER NOT NULL,
     "system_path" CHAR(256),

@@ -23,4 +23,4 @@ database.db
 homestorage
 
 # System file storage
-./tmp/*
+tmp/
