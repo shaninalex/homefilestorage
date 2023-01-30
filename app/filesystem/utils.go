@@ -4,18 +4,6 @@ import (
 	"errors"
 )
 
-type File struct {
-	Id         int    `json:"id"`
-	Name       string `json:"name"`
-	MimeType   string `json:"mime_type"`
-	Size       int    `json:"size"`
-	SystemPath string `json:"system_path"`
-	Owner      int    `json:"owner"`
-	Hash       string `json:"hash"`
-	Public     bool   `json:"public"`
-	Created_at string `json:"created_at"`
-}
-
 var (
 	MAX_FILE_SIZE = 314572800 // 300Mb ( NOTE: This constant can be in configuration files )
 

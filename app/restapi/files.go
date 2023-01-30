@@ -2,6 +2,7 @@ package restapi
 
 import (
 	"encoding/json"
+	"fmt"
 	"homestorage/app/filesystem"
 	"homestorage/app/utils"
 	"io"
@@ -42,7 +43,7 @@ func (h *BaseHandler) RouteSaveFile(w http.ResponseWriter, req bunrouter.Request
 		return err
 	}
 
-	file := filesystem.File{
+	file := utils.File{
 		Owner:      *id,
 		MimeType:   file_type,
 		Size:       int(fileHeader.Size),
@@ -68,16 +69,12 @@ func (h *BaseHandler) RouteSaveFile(w http.ResponseWriter, req bunrouter.Request
 }
 
 func (h *BaseHandler) RouteFilesList(w http.ResponseWriter, req bunrouter.Request) error {
-	file := filesystem.File{}
+	p := req.URL.Query().Get("parent")
+	fmt.Println(p)
+
+	resp_data := utils.FilesListResponse{}
 	w.Header().Set("Content-Type", "application/json")
 	w.WriteHeader(http.StatusCreated)
-	json.NewEncoder(w).Encode(file)
-	/*
-		{
-			"folders": [], // without parrent
-			"files": [], // in root directory, without folder
-			"parent": 0,
-		}
-	*/
+	json.NewEncoder(w).Encode(resp_data)
 	return nil
 }
