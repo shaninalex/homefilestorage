@@ -6,6 +6,7 @@ import { DashboardComponent } from './dashboard.component';
 import { DashboardRoutingModule } from './dashboard-routing.module';
 import { SidebarComponent } from './layout/sidebar/sidebar.component';
 import { HeaderComponent } from './layout/header/header.component';
+import { FontAwesomeModule } from '@fortawesome/angular-fontawesome';
 
 
 @NgModule({
@@ -16,7 +17,8 @@ import { HeaderComponent } from './layout/header/header.component';
     ],
     imports: [
         CommonModule,
-        DashboardRoutingModule
+        DashboardRoutingModule,
+        FontAwesomeModule
     ],
     providers: [
         {
