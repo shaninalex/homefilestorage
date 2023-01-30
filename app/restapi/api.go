@@ -41,6 +41,7 @@ func Server(db *database.DatabaseRepository, port int) {
 	router.POST("/api/v1/account/refresh/", h.RouteRefreshToken) // require token
 
 	router.POST("/api/v1/files/upload/", h.RouteSaveFile) // require token
+	router.GET("/api/v1/files/", h.RouteFilesList)
 
 	log.Printf("Start server under :%d port...", port)
 	http.ListenAndServe(fmt.Sprintf(":%d", port), router)
