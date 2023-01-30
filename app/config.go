@@ -2,7 +2,7 @@ package app
 
 import (
 	"fmt"
-	"homestorage/app/database"
+	"homestorage/app/utils"
 
 	"github.com/spf13/viper"
 )
@@ -12,7 +12,7 @@ type ApplicationConfig struct {
 }
 
 type Config struct {
-	Database    *database.DBConfig
+	Database    *utils.DBConfig
 	Application *ApplicationConfig
 }
 

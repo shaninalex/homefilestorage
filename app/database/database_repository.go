@@ -3,7 +3,7 @@ package database
 import (
 	"database/sql"
 	"fmt"
-	"homestorage/app/filesystem"
+	"homestorage/app/utils"
 	"io"
 	"log"
 	"os"
@@ -16,7 +16,7 @@ import (
 // 	- delete
 //  - return predefined errors
 
-func CreateDatabaseConnection(conf *DBConfig) (*DatabaseRepository, error) {
+func CreateDatabaseConnection(conf *utils.DBConfig) (*DatabaseRepository, error) {
 
 	db, err := sql.Open(conf.DB_ENGINE, conf.DB_PATH)
 	if err != nil {
@@ -52,8 +52,8 @@ func (r *DatabaseRepository) Migrate() error {
 	return nil
 }
 
-func (r *DatabaseRepository) GetUser(id *int) (*User, error) {
-	var user User
+func (r *DatabaseRepository) GetUser(id *int) (*utils.User, error) {
+	var user utils.User
 	row := r.db.QueryRow("SELECT id, email, active, hashed_password, created_at FROM users WHERE id=?;", &id)
 	err := row.Scan(&user.Id, &user.Email, &user.Active, &user.Hashed_password, &user.Created_at)
 	if err != nil {
@@ -62,8 +62,8 @@ func (r *DatabaseRepository) GetUser(id *int) (*User, error) {
 	return &user, nil
 }
 
-func (r *DatabaseRepository) GetUserByEmail(email string) (*User, error) {
-	var user User
+func (r *DatabaseRepository) GetUserByEmail(email string) (*utils.User, error) {
+	var user utils.User
 	row := r.db.QueryRow("SELECT id, email, active, hashed_password, created_at FROM users WHERE email=?;", email)
 	err := row.Scan(&user.Id, &user.Email, &user.Active, &user.Hashed_password, &user.Created_at)
 	if err != nil {
@@ -72,7 +72,7 @@ func (r *DatabaseRepository) GetUserByEmail(email string) (*User, error) {
 	return &user, nil
 }
 
-func (r *DatabaseRepository) CreateUser(payload *CreateUserPayload) error {
+func (r *DatabaseRepository) CreateUser(payload *utils.CreateUserPayload) error {
 	// TODO: Remove generating password hash from database package!
 	query := "INSERT INTO users (email, hashed_password) VALUES (?, ?) RETURNING id;"
 	_, err := r.db.Exec(query, payload.Email, payload.HashedPassword)
@@ -82,7 +82,7 @@ func (r *DatabaseRepository) CreateUser(payload *CreateUserPayload) error {
 	return nil
 }
 
-func (r *DatabaseRepository) SaveFileRecord(payload *filesystem.File) (int, error) {
+func (r *DatabaseRepository) SaveFileRecord(payload *utils.File) (int, error) {
 	var id int
 	query := `
 		INSERT INTO files 
@@ -102,4 +102,8 @@ func (r *DatabaseRepository) SaveFileRecord(payload *filesystem.File) (int, erro
 		return 0, err
 	}
 	return id, nil
+}
+
+func (r *DatabaseRepository) GetScreenListData(id int) (*utils.FilesListResponse, error) {
+	return nil, nil
 }

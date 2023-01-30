@@ -1,7 +1,6 @@
 package utils
 
 import (
-	"homestorage/app/database"
 	"time"
 )
 
@@ -12,7 +11,7 @@ type PublicUserObject struct {
 	Created_at *time.Time `json:"created_at"`
 }
 
-func PublicUser(user *database.User) *PublicUserObject {
+func PublicUser(user *User) *PublicUserObject {
 	// We need to remove hashed password from public available
 	// user object
 	public_user := &PublicUserObject{

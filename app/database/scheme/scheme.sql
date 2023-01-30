@@ -21,9 +21,11 @@ CREATE TABLE IF NOT EXISTS "files"
     "owner" INTEGER NOT NULL,
     "hash" TEXT NOT NULL,
     "public" BOOLEAN NOT NULL DEFAULT true,
+    "folder" INTEGER,
     "created_at" DATETIME DEFAULT current_timestamp
     CHECK ("size" > 0),
-    FOREIGN KEY ("owner") REFERENCES "users" ("id") ON DELETE CASCADE
+    FOREIGN KEY ("owner") REFERENCES "users" ("id") ON DELETE CASCADE,
+    FOREIGN KEY ("folder") REFERENCES "folders" ("id") ON DELETE CASCADE
 );
 
 CREATE INDEX IF NOT EXISTS "files_name_idx" ON "files" ( "name" );
