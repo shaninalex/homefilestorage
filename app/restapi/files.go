@@ -66,3 +66,18 @@ func (h *BaseHandler) RouteSaveFile(w http.ResponseWriter, req bunrouter.Request
 
 	return nil
 }
+
+func (h *BaseHandler) RouteFilesList(w http.ResponseWriter, req bunrouter.Request) error {
+	file := filesystem.File{}
+	w.Header().Set("Content-Type", "application/json")
+	w.WriteHeader(http.StatusCreated)
+	json.NewEncoder(w).Encode(file)
+	/*
+		{
+			"folders": [], // without parrent
+			"files": [], // in root directory, without folder
+			"parent": 0,
+		}
+	*/
+	return nil
+}
