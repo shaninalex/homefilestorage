@@ -6,6 +6,9 @@ const routes: Routes = [
     {
         path: '',
         component: DashboardComponent,
+        children: [
+            { path: '', loadChildren: () => import('./apps/files/files.module').then(m => m.FilesModule) },
+        ]
     }
 ];
 
