@@ -2,21 +2,20 @@ import { NgModule } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FilesComponent } from './files.component';
 import { FilesRoutingModule } from './files-routing.module';
-import { FontAwesomeModule } from '@fortawesome/angular-fontawesome';
-// import { FileItemComponent } from './file-item/file-item.component';
-import { FileSizePipe } from '../../globals/filesize.pipe';
+import { FileItemComponent } from './file-item/file-item.component';
+import { SharedModule } from '../../globals/shared.module';
+    
 
 
 @NgModule({
     declarations: [
         FilesComponent,
-        // FileItemComponent,
-        FileSizePipe
+        FileItemComponent,
     ],
     imports: [
         CommonModule,
         FilesRoutingModule,
-        FontAwesomeModule
+        SharedModule
     ],
     providers: []
 })

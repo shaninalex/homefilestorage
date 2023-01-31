@@ -1,0 +1,24 @@
+.head {
+    cursor: pointer;
+    display: flex;
+
+    &-action {
+        width: 5%;
+    }
+    &-type {
+        width: 5%;    
+    }
+    &-name {
+        width: 10%;
+    }
+    &-size {
+        width: 5%;
+    }
+    &-public {
+        width: 5%;
+    }
+    &-created {
+        width: 10%;
+        
+    }
+}
