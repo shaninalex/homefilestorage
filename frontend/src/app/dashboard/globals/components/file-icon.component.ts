@@ -1,5 +1,5 @@
 import { Component, Input } from "@angular/core";
-import { FILE_TYPES_ICONS } from '../files.service';
+import { FILE_TYPES_ICONS } from '../constants';
 import { faFile, faFilePdf, faFileArchive, faTable, faFilePowerpoint, faFileWord, faImage, faVideo, faHeadphones } from '@fortawesome/free-solid-svg-icons';
 
 @Component({
