@@ -57,7 +57,8 @@ func (s *FileStorage) SaveFileToStorage(file multipart.File, fileHeader *multipa
 
 	buf, _ := ioutil.ReadFile(save_path)
 	kind, _ := filetype.Match(buf)
-	if kind == filetype.Unknown {
+
+	if filetype.IsImage(buf) && filetype.IsDocument(buf) && filetype.IsAudio(buf) && filetype.IsArchive(buf) && filetype.IsVideo(buf) {
 		os.Remove(save_path)
 		return nil, errors.New("unknow file type")
 	}
