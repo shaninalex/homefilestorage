@@ -12,6 +12,7 @@ export interface FileItem {
     id?: number
     name: string
     size: number
-    modified: Date
-    public: boolean
+    created_at: Date
+    public: boolean,
+    type: string
 }

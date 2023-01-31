@@ -7,13 +7,14 @@ import { DashboardRoutingModule } from './dashboard-routing.module';
 import { SidebarComponent } from './layout/sidebar/sidebar.component';
 import { HeaderComponent } from './layout/header/header.component';
 import { FontAwesomeModule } from '@fortawesome/angular-fontawesome';
+import { FileIconComponent } from './globals/components/file-icon.component';
 
 
 @NgModule({
     declarations: [
         DashboardComponent,
         SidebarComponent, 
-        HeaderComponent
+        HeaderComponent,
     ],
     imports: [
         CommonModule,
