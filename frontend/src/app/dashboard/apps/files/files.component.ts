@@ -15,7 +15,8 @@ export class FilesComponent {
     icon = faFilePdf;
     folder_icon = faFolder;
 
-    constructor() { 
+    constructor() {
+        
         this.files = [
             {
                 id: 1,

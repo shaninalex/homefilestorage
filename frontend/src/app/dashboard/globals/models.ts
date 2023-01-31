@@ -13,6 +13,21 @@ export interface FileItem {
     name: string
     size: number
     created_at: Date
-    public: boolean,
+    public: boolean
     type: string
+}
+
+export interface FolderItem {
+    id?: number
+    name: string
+    created_at: Date
+    public: boolean
+}
+
+export interface ServerResponse {
+    folders: Array<FolderItem>
+    files: Array<FileItem>
+    parent: number,
+    offset: number,
+    limit: number
 }
