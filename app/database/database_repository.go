@@ -82,12 +82,12 @@ func (r *DatabaseRepository) CreateUser(payload *utils.CreateUserPayload) error 
 }
 
 func (r *DatabaseRepository) SaveFileRecord(payload *utils.File) (int, error) {
-	var id int
+	var id int64
 	query := `
 		INSERT INTO files 
 			(name, mime_type, size, system_path, owner, hash, public) 
 		VALUES (?, ?, ?, ?, ?, ?, ?) RETURNING id;`
-	_, err := r.db.Exec(query,
+	row, err := r.db.Exec(query,
 		payload.Name,
 		payload.MimeType,
 		payload.Size,
@@ -99,7 +99,11 @@ func (r *DatabaseRepository) SaveFileRecord(payload *utils.File) (int, error) {
 	if err != nil {
 		return 0, err
 	}
-	return id, nil
+	id, err = row.LastInsertId()
+	if err != nil {
+		return 0, err
+	}
+	return int(id), nil
 }
 
 func (r *DatabaseRepository) GetScreenListData(parent_id int, owner_id int) (*utils.FilesListResponse, error) {

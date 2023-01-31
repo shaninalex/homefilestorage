@@ -2,7 +2,6 @@ package restapi
 
 import (
 	"encoding/json"
-	"homestorage/app/filesystem"
 	"homestorage/app/utils"
 	"io"
 	"net/http"
@@ -13,58 +12,49 @@ import (
 )
 
 func (h *BaseHandler) RouteSaveFile(w http.ResponseWriter, req bunrouter.Request) error {
-	// Get user
 	token := req.Header.Get("Authorization")
 	_, id, err := utils.IdentifyJWT(strings.Replace(token, "Bearer ", "", 1))
 	if err != nil {
 		return err
 	}
 
-	// Get and validate request file
-	rFile, fileHeader, err := req.FormFile("file")
+	file, handler, err := req.FormFile("file")
 	if err != nil {
 		return err
 	}
-	defer rFile.Close()
+	defer file.Close()
 
-	robots, err := io.ReadAll(rFile)
+	robots, err := io.ReadAll(file)
 	if err != nil {
 		return err
 	}
 	file_type := http.DetectContentType(robots)
-
-	err = filesystem.ValidateFile(fileHeader.Size, file_type)
+	save_path, hash_string, err := h.storage.SaveFileToStorage(file, handler)
 	if err != nil {
 		return err
 	}
 
-	systemPath, hash, err := filesystem.SaveFileToStorage(rFile, fileHeader)
-	if err != nil {
-		return err
-	}
-
-	file := utils.File{
+	dFile := utils.File{
 		Owner:      *id,
 		MimeType:   file_type,
-		Size:       int(fileHeader.Size),
-		SystemPath: *systemPath,
-		Hash:       *hash,
-		Name:       fileHeader.Filename,
+		Size:       int(handler.Size),
+		SystemPath: *save_path,
+		Hash:       *hash_string,
+		Name:       handler.Filename,
 		Public:     true,
 	}
 
-	// TODO: does not return file id
-	new_file_id, err := h.db.SaveFileRecord(&file)
+	new_file_id, err := h.db.SaveFileRecord(&dFile)
 
 	if err != nil {
 		return err
 	}
 
-	file.Id = new_file_id
+	dFile.Id = new_file_id
 
 	w.Header().Set("Content-Type", "application/json")
 	w.WriteHeader(http.StatusCreated)
-	json.NewEncoder(w).Encode(file)
+	json.NewEncoder(w).Encode(dFile)
 
 	return nil
 }

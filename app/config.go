@@ -11,9 +11,14 @@ type ApplicationConfig struct {
 	PORT int
 }
 
+type StorageConfig struct {
+	SYSTEM_PATH string
+}
+
 type Config struct {
 	Database    *utils.DBConfig
 	Application *ApplicationConfig
+	FileStorage *StorageConfig
 }
 
 func GetConfig(configPath string) Config {

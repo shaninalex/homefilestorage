@@ -4,6 +4,7 @@ import (
 	"errors"
 	"fmt"
 	"homestorage/app/database"
+	"homestorage/app/filesystem"
 	"log"
 	"net/http"
 
@@ -11,12 +12,18 @@ import (
 )
 
 type BaseHandler struct {
-	db *database.DatabaseRepository
+	db      *database.DatabaseRepository
+	storage *filesystem.FileStorage
 }
 
-func Handlers(db *database.DatabaseRepository) *BaseHandler {
+func Handlers(db *database.DatabaseRepository, path string) *BaseHandler {
+	storage, err := filesystem.CreateFileStorage(path)
+	if err != nil {
+		log.Println(err)
+	}
 	return &BaseHandler{
-		db: db,
+		db:      db,
+		storage: storage,
 	}
 }
 
@@ -28,11 +35,11 @@ var (
 	ErrCantRafreshToken            = errors.New("cant refresh token")
 )
 
-func Server(db *database.DatabaseRepository, port int) {
+func Server(db *database.DatabaseRepository, storage_path string, port int) {
 
 	router := bunrouter.New(bunrouter.Use(ErrorHandler))
 
-	h := Handlers(db)
+	h := Handlers(db, storage_path)
 
 	router.GET("/", h.RouteIndex)
 	router.GET("/api/v1/account/", h.RouteGetAccount) // require token
