@@ -1,14 +1,17 @@
 package filesystem
 
 import (
+	"errors"
 	"fmt"
+	"homestorage/app/utils"
 	"io"
+	"io/ioutil"
 	"mime/multipart"
 	"os"
 	"path/filepath"
 	"time"
 
-	"github.com/google/uuid"
+	"github.com/h2non/filetype"
 )
 
 type FileStorage struct {
@@ -29,25 +32,39 @@ func CreateFileStorage(path string) (*FileStorage, error) {
 	}, nil
 }
 
-func (s *FileStorage) SaveFileToStorage(file multipart.File, fileHeader *multipart.FileHeader) (*string, *string, error) {
+func (s *FileStorage) SaveFileToStorage(file multipart.File, fileHeader *multipart.FileHeader, dFile *utils.File) (*utils.File, error) {
 
-	ext1 := filepath.Ext(fileHeader.Filename)
-	new_generated_name := uuid.New().String() + ext1
+	new_generated_name := fmt.Sprint(time.Now().Unix()) + filepath.Ext(fileHeader.Filename)
 
 	date := time.Now()
 	save_path := fmt.Sprintf("%s/%d/%d/%d/%s", s.storage, date.Year(), date.Month(), date.Day(), new_generated_name)
 
 	f, err := os.OpenFile(save_path, os.O_WRONLY|os.O_CREATE, 0666)
 	if err != nil {
-		return nil, nil, err
+		return nil, err
 	}
 	defer f.Close()
-	io.Copy(f, file) // save content into new file
 
-	// hash_string, err := "HashFileSha1(save_path)", nil
-	// if err != nil {
-	// 	return nil, nil, err
-	// }
-	hash_string := "&hash_string"
-	return &save_path, &hash_string, nil
+	_, err = io.Copy(f, file) // save content into new file
+	if err != nil {
+		return nil, err
+	}
+
+	hash_string, err := HashFileSha1(save_path)
+	if err != nil {
+		return nil, err
+	}
+
+	buf, _ := ioutil.ReadFile(save_path)
+	kind, _ := filetype.Match(buf)
+	if kind == filetype.Unknown {
+		os.Remove(save_path)
+		return nil, errors.New("unknow file type")
+	}
+
+	dFile.SystemPath = save_path
+	dFile.Hash = hash_string
+	dFile.MimeType = kind.MIME.Value
+
+	return dFile, nil
 }
