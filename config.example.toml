@@ -7,4 +7,4 @@ DB_PATH = "./database.db"
 PORT = 8080
 
 [FileStorage]
-SYSTEM_PATH = './tmp/storage/'
+SYSTEM_PATH = './tmp/storage'

@@ -3,7 +3,6 @@ package restapi
 import (
 	"encoding/json"
 	"homestorage/app/utils"
-	"io"
 	"net/http"
 	"strconv"
 	"strings"
@@ -24,27 +23,19 @@ func (h *BaseHandler) RouteSaveFile(w http.ResponseWriter, req bunrouter.Request
 	}
 	defer file.Close()
 
-	robots, err := io.ReadAll(file)
-	if err != nil {
-		return err
+	dFile := &utils.File{
+		Owner:  *id,
+		Size:   int(handler.Size),
+		Name:   handler.Filename,
+		Public: true,
 	}
-	file_type := http.DetectContentType(robots)
-	save_path, hash_string, err := h.storage.SaveFileToStorage(file, handler)
+
+	dFile, err = h.storage.SaveFileToStorage(file, handler, dFile)
 	if err != nil {
 		return err
 	}
 
-	dFile := utils.File{
-		Owner:      *id,
-		MimeType:   file_type,
-		Size:       int(handler.Size),
-		SystemPath: *save_path,
-		Hash:       *hash_string,
-		Name:       handler.Filename,
-		Public:     true,
-	}
-
-	new_file_id, err := h.db.SaveFileRecord(&dFile)
+	new_file_id, err := h.db.SaveFileRecord(dFile)
 
 	if err != nil {
 		return err
