@@ -28,5 +28,5 @@ func Run(conf *Config) {
 	app.config = conf
 
 	// Run http server
-	restapi.Server(app.DB, app.config.Application.PORT)
+	restapi.Server(app.DB, conf.FileStorage.SYSTEM_PATH, app.config.Application.PORT)
 }
