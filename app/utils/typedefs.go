@@ -48,12 +48,6 @@ type Folder struct {
 	Created_at time.Time `json:"created_at"`
 }
 
-type FilesListResponse struct {
-	Folders []Folder `json:"folders"`
-	Files   []File   `json:"files"`
-	Parent  int      `json:"parent"`
-}
-
 type CreateUserPayload struct {
 	Email          string
 	HashedPassword string

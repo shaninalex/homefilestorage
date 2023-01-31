@@ -31,10 +31,6 @@ export class FileIconComponent {
                 return this.file_to_icon[key];
             }
         }
-
         return this.file_to_icon["default"];
     }
-
-
-
 }

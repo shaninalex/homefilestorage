@@ -106,40 +106,40 @@ func (r *DatabaseRepository) SaveFileRecord(payload *utils.File) (int, error) {
 	return int(id), nil
 }
 
-func (r *DatabaseRepository) GetScreenListData(parent_id int, owner_id int) (*utils.FilesListResponse, error) {
-	response := utils.FilesListResponse{}
-	var rows *sql.Rows
-	var err error
-	if parent_id != 0 {
-		query := `SELECT id, name, mime_type, size 
-					FROM files 
-					WHERE folder=? AND owner=?;`
-		rows, err = r.db.Query(query, parent_id, owner_id)
-		if err != nil {
-			return nil, err
-		}
-	} else {
-		query := `SELECT id, name, mime_type, size 
-					FROM files 
-					WHERE folder IS NULL AND owner=?;`
-		rows, err = r.db.Query(query, owner_id)
-		if err != nil {
-			return nil, err
-		}
-	}
-	for rows.Next() {
-		file := utils.File{}
-		err := rows.Scan(
-			&file.Id,
-			&file.Name,
-			&file.MimeType,
-			&file.Size,
-		)
-		if err != nil {
-			return nil, err
-		}
-		response.Files = append(response.Files, file)
-	}
+// func (r *DatabaseRepository) GetScreenListData(parent_id int, owner_id int) (*utils.FilesListResponse, error) {
+// 	response := utils.FilesListResponse{}
+// 	var rows *sql.Rows
+// 	var err error
+// 	if parent_id != 0 {
+// 		query := `SELECT id, name, mime_type, size
+// 					FROM files
+// 					WHERE folder=? AND owner=?;`
+// 		rows, err = r.db.Query(query, parent_id, owner_id)
+// 		if err != nil {
+// 			return nil, err
+// 		}
+// 	} else {
+// 		query := `SELECT id, name, mime_type, size
+// 					FROM files
+// 					WHERE folder IS NULL AND owner=?;`
+// 		rows, err = r.db.Query(query, owner_id)
+// 		if err != nil {
+// 			return nil, err
+// 		}
+// 	}
+// 	for rows.Next() {
+// 		file := utils.File{}
+// 		err := rows.Scan(
+// 			&file.Id,
+// 			&file.Name,
+// 			&file.MimeType,
+// 			&file.Size,
+// 		)
+// 		if err != nil {
+// 			return nil, err
+// 		}
+// 		response.Files = append(response.Files, file)
+// 	}
 
-	return &response, nil
-}
+// 	return &response, nil
+// }
