@@ -1,8 +1,21 @@
 import { Injectable } from "@angular/core";
+import { Observable, of } from "rxjs";
+import { ServerResponse } from "./models";
+import { SharedModule } from "./shared.module";
 
 
-
-@Injectable()
+@Injectable({
+    providedIn: SharedModule,
+})
 export class StorageService {
-    
+
+    getServerResponse(): Observable<ServerResponse> {
+        return of({
+            folders: [],
+            files: [],
+            limit: 40,
+            offset: 0,
+            parent: 0
+        })
+    }
 }
