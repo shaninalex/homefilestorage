@@ -106,40 +106,49 @@ func (r *DatabaseRepository) SaveFileRecord(payload *utils.File) (int, error) {
 	return int(id), nil
 }
 
-// func (r *DatabaseRepository) GetScreenListData(parent_id int, owner_id int) (*utils.FilesListResponse, error) {
-// 	response := utils.FilesListResponse{}
-// 	var rows *sql.Rows
-// 	var err error
-// 	if parent_id != 0 {
-// 		query := `SELECT id, name, mime_type, size
-// 					FROM files
-// 					WHERE folder=? AND owner=?;`
-// 		rows, err = r.db.Query(query, parent_id, owner_id)
-// 		if err != nil {
-// 			return nil, err
-// 		}
-// 	} else {
-// 		query := `SELECT id, name, mime_type, size
-// 					FROM files
-// 					WHERE folder IS NULL AND owner=?;`
-// 		rows, err = r.db.Query(query, owner_id)
-// 		if err != nil {
-// 			return nil, err
-// 		}
-// 	}
-// 	for rows.Next() {
-// 		file := utils.File{}
-// 		err := rows.Scan(
-// 			&file.Id,
-// 			&file.Name,
-// 			&file.MimeType,
-// 			&file.Size,
-// 		)
-// 		if err != nil {
-// 			return nil, err
-// 		}
-// 		response.Files = append(response.Files, file)
-// 	}
+func (r *DatabaseRepository) GetFolder(fileId int, userId int) (*utils.Folder, error) {
 
-// 	return &response, nil
-// }
+	return nil, nil
+}
+
+func (r *DatabaseRepository) GetFolders(fileId int, userId int) (*[]utils.Folder, error) {
+
+	return nil, nil
+}
+
+func (r *DatabaseRepository) GetFiles(fileId int, userId int) (*[]utils.File, error) {
+
+	return nil, nil
+}
+
+func (r *DatabaseRepository) GetFile(fileId int, userId int) (*utils.File, error) {
+	var file utils.File
+	query := `	
+		SELECT 
+			id, name, mime_type, size, system_path, owner, hash, public, folder, created_at 
+		FROM files 
+		WHERE 
+			id = ? AND owner = ? 
+		LIMIT 1
+	`
+	row := r.db.QueryRow(query, userId, fileId)
+	err := row.Scan(
+		&file.Id,
+		&file.Name,
+		&file.MimeType,
+		&file.Size,
+		&file.SystemPath,
+		&file.Owner,
+		&file.Hash,
+		&file.Public,
+		&file.Folder,
+		&file.Created_at,
+	)
+
+	if err != nil {
+		log.Fatal(err)
+		return nil, err
+	}
+
+	return &file, nil
+}

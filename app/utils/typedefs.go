@@ -36,7 +36,7 @@ type File struct {
 	Owner      int       `json:"owner"`
 	Hash       string    `json:"hash"`
 	Public     bool      `json:"public"`
-	Folder     int       `json:"folder"`
+	Folder     *int      `json:"folder"`
 	Created_at time.Time `json:"created_at"`
 }
 
