@@ -1,7 +1,6 @@
-import { Component } from '@angular/core';
-// import { faFilePdf } from '@fortawesome/free-solid-svg-icons';
-import { faFilePdf, faFolder } from '@fortawesome/free-solid-svg-icons';
-import { FileItem } from '../../globals/models';
+import { Component, OnInit } from '@angular/core';
+import { StorageService } from '../../globals/files.service';
+import { FileItem, FolderItem } from '../../globals/models';
 
 
 @Component({
@@ -9,15 +8,14 @@ import { FileItem } from '../../globals/models';
     templateUrl: './files.component.html',
     styleUrls: ['./files.component.scss'],
 })
-export class FilesComponent {
+export class FilesComponent implements OnInit {
 
-    files: FileItem[];
-    icon = faFilePdf;
-    folder_icon = faFolder;
+    items: Array<FileItem|FolderItem>;
 
-    constructor() {
+    constructor(private storageService: StorageService) {}
 
-        this.files = []
+    ngOnInit(): void {
+        
     }
 
 }
