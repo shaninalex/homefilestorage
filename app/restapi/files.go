@@ -62,7 +62,6 @@ func (h *BaseHandler) RouteFilesList(w http.ResponseWriter, req bunrouter.Reques
 		return err
 	}
 
-	// resp_data, err := h.db.GetScreenListData(parent_id, *owner_id)
 	if err != nil {
 		return err
 	}

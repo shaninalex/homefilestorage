@@ -25,8 +25,7 @@ export interface FolderItem {
 }
 
 export interface ServerResponse {
-    folders: Array<FolderItem>
-    files: Array<FileItem>
+    items: Array<FolderItem|FileItem>
     parent: number,
     offset: number,
     limit: number

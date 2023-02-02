@@ -11,8 +11,7 @@ export class StorageService {
 
     getServerResponse(): Observable<ServerResponse> {
         return of({
-            folders: [],
-            files: [],
+            items: [],
             limit: 40,
             offset: 0,
             parent: 0
