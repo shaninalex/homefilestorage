@@ -152,3 +152,25 @@ func (r *DatabaseRepository) GetFile(fileId int, userId int) (*utils.File, error
 
 	return &file, nil
 }
+
+func (r *DatabaseRepository) GetFilePath(fileId int, userId int) (*string, error) {
+	var path string
+	query := `	
+		SELECT 
+			system_path
+		FROM files 
+		WHERE 
+			id = ? AND owner = ? 
+		LIMIT 1
+	`
+	row := r.db.QueryRow(query, userId, fileId)
+	err := row.Scan(
+		&path,
+	)
+
+	if err != nil {
+		return nil, err
+	}
+
+	return &path, nil
+}

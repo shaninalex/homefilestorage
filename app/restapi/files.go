@@ -113,3 +113,29 @@ func (h *BaseHandler) RouteFileItem(w http.ResponseWriter, req bunrouter.Request
 
 	return nil
 }
+
+func (h *BaseHandler) RouteFileItemContent(w http.ResponseWriter, req bunrouter.Request) error {
+	token := req.Header.Get("Authorization")
+	_, userId, err := utils.IdentifyJWT(strings.Replace(token, "Bearer ", "", 1))
+	if err != nil {
+		return err
+	}
+
+	_fileId, exist := req.Params().Get("id")
+	fileId, err := strconv.Atoi(_fileId)
+	if err != nil {
+		return err
+	}
+	if !exist {
+		return errors.New("o file id provided")
+	}
+
+	filePath, err := h.db.GetFilePath(fileId, *userId)
+	if err != nil {
+		return err
+	}
+
+	http.ServeFile(w, req.Request, *filePath)
+
+	return nil
+}

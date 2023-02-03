@@ -50,6 +50,7 @@ func Server(db *database.DatabaseRepository, storage_path string, port int) {
 	router.POST("/api/v1/files/upload/", h.RouteSaveFile)
 	router.GET("/api/v1/files/", h.RouteFilesList)
 	router.GET("/api/v1/file/:id/", h.RouteFileItem)
+	router.GET("/api/v1/file-content/:id/", h.RouteFileItemContent)
 
 	// public ( shared links )
 
