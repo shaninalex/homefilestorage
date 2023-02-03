@@ -40,14 +40,21 @@ func (s *FileStorage) SaveFileToStorage(file multipart.File, fileHeader *multipa
 	date := time.Now()
 	save_path := fmt.Sprintf("%s/%d/%d/%d/%s", s.storage, date.Year(), date.Month(), date.Day(), new_generated_name)
 
-	f, err := os.OpenFile(save_path, os.O_CREATE, 0666)
+	// Create file path before creating
+	if err := os.MkdirAll(filepath.Dir(save_path), 0770); err != nil {
+		return nil, err
+	}
+
+	// Opening file
+	f, err := os.OpenFile(save_path, os.O_WRONLY|os.O_CREATE, 0666)
 	if err != nil {
 		log.Println(err)
 		return nil, err
 	}
 	defer f.Close()
 
-	_, err = io.Copy(f, file) // save content into new file
+	// save content into file
+	_, err = io.Copy(f, file)
 	if err != nil {
 		return nil, err
 	}
