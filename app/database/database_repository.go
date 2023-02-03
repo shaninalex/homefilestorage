@@ -131,7 +131,7 @@ func (r *DatabaseRepository) GetFile(fileId int, userId int) (*utils.File, error
 			id = ? AND owner = ? 
 		LIMIT 1
 	`
-	row := r.db.QueryRow(query, userId, fileId)
+	row := r.db.QueryRow(query, fileId, userId)
 	err := row.Scan(
 		&file.Id,
 		&file.Name,
@@ -146,7 +146,7 @@ func (r *DatabaseRepository) GetFile(fileId int, userId int) (*utils.File, error
 	)
 
 	if err != nil {
-		log.Fatal(err)
+		log.Println(err)
 		return nil, err
 	}
 
@@ -155,15 +155,9 @@ func (r *DatabaseRepository) GetFile(fileId int, userId int) (*utils.File, error
 
 func (r *DatabaseRepository) GetFilePath(fileId int, userId int) (*string, error) {
 	var path string
-	query := `	
-		SELECT 
-			system_path
-		FROM files 
-		WHERE 
-			id = ? AND owner = ? 
-		LIMIT 1
-	`
-	row := r.db.QueryRow(query, userId, fileId)
+	query := `SELECT system_path FROM files WHERE id = ? AND owner = ? LIMIT 1`
+	log.Println(fileId, userId)
+	row := r.db.QueryRow(query, fileId, userId)
 	err := row.Scan(
 		&path,
 	)

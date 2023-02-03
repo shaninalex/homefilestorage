@@ -57,16 +57,19 @@ func NewHTTPError(err error) HTTPError {
 func ErrorHandler(next bunrouter.HandlerFunc) bunrouter.HandlerFunc {
 	return func(w http.ResponseWriter, req bunrouter.Request) error {
 		// Call the next handler on the chain to get the error.
-		w.Header().Set("Content-Type", "application/json")
+
 		err := next(w, req)
 
 		switch err := err.(type) {
 		case nil:
+			w.Header().Set("Content-Type", "application/json")
 			// no error
 		case HTTPError: // already a HTTPError
+			w.Header().Set("Content-Type", "application/json")
 			w.WriteHeader(err.StatusCode)
 			_ = bunrouter.JSON(w, err)
 		default:
+			w.Header().Set("Content-Type", "application/json")
 			httpErr := NewHTTPError(err)
 			w.WriteHeader(httpErr.StatusCode)
 			_ = bunrouter.JSON(w, httpErr)
