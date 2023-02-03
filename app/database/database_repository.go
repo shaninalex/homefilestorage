@@ -169,6 +169,7 @@ func (r *DatabaseRepository) GetFilePath(fileId int, userId int) (*string, error
 	)
 
 	if err != nil {
+		log.Println(err)
 		return nil, err
 	}
 
