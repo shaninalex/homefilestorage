@@ -6,6 +6,7 @@ import (
 	"homestorage/app/utils"
 	"io"
 	"io/ioutil"
+	"log"
 	"mime/multipart"
 	"os"
 	"path/filepath"
@@ -39,8 +40,9 @@ func (s *FileStorage) SaveFileToStorage(file multipart.File, fileHeader *multipa
 	date := time.Now()
 	save_path := fmt.Sprintf("%s/%d/%d/%d/%s", s.storage, date.Year(), date.Month(), date.Day(), new_generated_name)
 
-	f, err := os.OpenFile(save_path, os.O_WRONLY|os.O_CREATE, 0666)
+	f, err := os.OpenFile(save_path, os.O_CREATE, 0666)
 	if err != nil {
+		log.Println(err)
 		return nil, err
 	}
 	defer f.Close()
