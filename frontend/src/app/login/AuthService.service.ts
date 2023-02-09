@@ -9,9 +9,9 @@ import { LoginRequest, LoginResponse, RegisterRequest } from './typedefs';
 export class AuthService {
     constructor(private http: HttpClient) { }
 
-    configUrl: string = '/api/v1/account/login/';
-    url_register: string = '/api/v1/account/create/';
-    url_refresh: string = '/api/v1/account/refresh/';
+    configUrl: string = '/api/v1/auth/login';
+    url_register: string = '/api/v1/auth/create/';
+    url_refresh: string = '/api/v1/auth/refresh/';
 
     login(login_data: LoginRequest) {
         return this.http.post<LoginResponse>(this.configUrl, login_data);
