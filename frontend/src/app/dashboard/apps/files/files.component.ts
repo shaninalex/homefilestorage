@@ -10,7 +10,7 @@ import { FileItem, FolderItem } from '../../globals/models';
 })
 export class FilesComponent implements OnInit {
 
-    items: Array<FileItem|FolderItem>;
+    // items?: Array<FileItem|FolderItem>;
 
     constructor(private storageService: StorageService) {}
 
