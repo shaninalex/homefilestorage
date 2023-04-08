@@ -1,17 +1,44 @@
 version: '3.7'
 
 services:
-  db:
-    image: postgres:14.5-alpine
+  krakend:
+    image: devopsfaith/krakend
+    container_name: yiazou_krakend
     volumes:
-      - postgres_data:/var/lib/postgres/data/
-    #      - ./app/db/sql/:/data/
+      - ./config/krakend:/etc/krakend
     ports:
-      - 5432:5432
-    environment:
-      - POSTGRES_USER=postgres
-      - POSTGRES_PASSWORD=postgres
-      - POSTGRES_DB=postgres
+      - "8080:8080"
+    command: ["run", "-d", "-c", "/etc/krakend/krakend.json"]
 
-volumes:
-  postgres_data:
+  postgres:
+    image: postgres:13.2
+    restart: unless-stopped
+    container_name: yiazou_postgres
+    volumes:
+      - ./volumes/postgres:/var/lib/postgresql/data/
+      - ./config/db/:/docker-entrypoint-initdb.d/
+    env_file:
+      - .env
+
+  mailhog:
+    image: mailhog/mailhog
+    container_name: yiazou_mailhog
+    ports:
+      - "1025:1025"
+      - "8025:8025"
+
+  rabbitmq:
+    image: rabbitmq:3-management-alpine
+    container_name: yiazou_rabbitmq
+    ports:
+      - 5672:5672
+      - 15672:15672
+
+  mongo:
+    image: mongo
+    ports:
+     - '27017:27017'
+    volumes:
+      - ./volumes/mongo/mongo-data:/data/db
+      - ./volumes/mongo/mongo-configdb:/data/configdb
+
