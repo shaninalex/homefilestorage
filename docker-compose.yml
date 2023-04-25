@@ -19,40 +19,6 @@ services:
       - ./config/db/:/docker-entrypoint-initdb.d/
     env_file:
       - .env
-  
-  # postgres:
-  #   image: postgres:13.2
-  #   restart: unless-stopped
-  #   environment:
-  #     POSTGRES_DB: ${POSTGRESQL_DB}
-  #     POSTGRES_USER: ${POSTGRESQL_USER}
-  #     POSTGRES_PASSWORD: ${POSTGRESQL_PASS}
-  #   networks:
-  #     - local-keycloak
-
-  keycloak:
-    depends_on:
-      - postgres
-    container_name: local_keycloak
-    environment:
-      DB_VENDOR: postgres
-      DB_ADDR: postgres
-      DB_DATABASE: ${POSTGRESQL_DB}
-      DB_USER: ${POSTGRESQL_USER}
-      DB_PASSWORD: ${POSTGRESQL_PASS}
-    image: jboss/keycloak:${KEYCLOAK_VERSION}
-    ports:
-      - "28080:8080"
-    restart: unless-stopped
-    networks:
-      - local-keycloak
-
-  # mailhog:
-  #   image: mailhog/mailhog
-  #   container_name: yiazou_mailhog
-  #   ports:
-  #     - "1025:1025"
-  #     - "8025:8025"
 
   rabbitmq:
     image: rabbitmq:3-management-alpine
@@ -60,12 +26,3 @@ services:
     ports:
       - 5672:5672
       - 15672:15672
-
-  # mongo:
-  #   image: mongo
-  #   ports:
-  #    - '27017:27017'
-  #   volumes:
-  #     - ./volumes/mongo/mongo-data:/data/db
-  #     - ./volumes/mongo/mongo-configdb:/data/configdb
-
