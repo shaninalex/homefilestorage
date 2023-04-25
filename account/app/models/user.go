@@ -12,7 +12,7 @@ type User struct {
 	Username  string    `json:"username" gorm:"unique"`
 	Active    bool      `json:"active"`
 	Password  string    `json:"password"`
-	UpdatedAt string    `json:"updated_at,omitempty" gorm:"autoUpdateTime"`
+	UpdatedAt time.Time `json:"updated_at,omitempty" gorm:"autoUpdateTime"`
 	CreatedAt time.Time `json:"created_at,omitempty" gorm:"autoCreateTime"`
 }
 
@@ -33,17 +33,18 @@ func (u *User) Create(db *gorm.DB) (uint, error) {
 }
 
 func (u *User) Update(db *gorm.DB) error {
-	err := db.Model(&User{}).Where("id = ?", u.ID).Updates(
-		User{
-			Email:    u.Email,
-			Username: u.Username,
-			Active:   u.Active,
-			Password: u.Password,
-		}).Error
+	err := db.Model(u).Updates(map[string]interface{}{
+		"email":      u.Email,
+		"username":   u.Username,
+		"active":     u.Active,
+		"password":   u.Password,
+		"updated_at": time.Now().Format("2006-01-02 15:04:05"),
+	}).Error
 
 	if err != nil {
 		return err
 	}
+
 	return nil
 }
 
