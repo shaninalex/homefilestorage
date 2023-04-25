@@ -20,12 +20,12 @@ services:
     env_file:
       - .env
 
-  mailhog:
-    image: mailhog/mailhog
-    container_name: yiazou_mailhog
-    ports:
-      - "1025:1025"
-      - "8025:8025"
+  # mailhog:
+  #   image: mailhog/mailhog
+  #   container_name: yiazou_mailhog
+  #   ports:
+  #     - "1025:1025"
+  #     - "8025:8025"
 
   rabbitmq:
     image: rabbitmq:3-management-alpine
@@ -34,11 +34,11 @@ services:
       - 5672:5672
       - 15672:15672
 
-  mongo:
-    image: mongo
-    ports:
-     - '27017:27017'
-    volumes:
-      - ./volumes/mongo/mongo-data:/data/db
-      - ./volumes/mongo/mongo-configdb:/data/configdb
+  # mongo:
+  #   image: mongo
+  #   ports:
+  #    - '27017:27017'
+  #   volumes:
+  #     - ./volumes/mongo/mongo-data:/data/db
+  #     - ./volumes/mongo/mongo-configdb:/data/configdb
 
