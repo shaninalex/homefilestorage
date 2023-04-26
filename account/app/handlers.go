@@ -6,9 +6,9 @@ import (
 	"log"
 	"net/http"
 	"reflect"
+	"strconv"
 
 	"github.com/gin-gonic/gin"
-	"github.com/google/uuid"
 )
 
 func Ping(c *gin.Context) {
@@ -18,7 +18,7 @@ func Ping(c *gin.Context) {
 }
 
 func (app *App) CreateUser(c *gin.Context) {
-	var newUser models.GetCreateAccount
+	var newUser models.User
 
 	if err := c.ShouldBindJSON(&newUser); err != nil {
 		log.Println(err)
@@ -26,15 +26,14 @@ func (app *App) CreateUser(c *gin.Context) {
 		return
 	}
 
-	newUser.Sub = uuid.New().String()
-	_, err := newUser.Create(app.Collection)
+	result, err := newUser.Create(app.DB)
 	if err != nil {
 		log.Println(err)
 		c.JSON(http.StatusInternalServerError, gin.H{"message": err.Error()})
 		return
 	}
 
-	Publish("register", fmt.Sprintf("New User registered with %s id", newUser.Sub), app.MQChannel, app.MQQueue)
+	Publish("register", fmt.Sprintf("New User registered with %s id", result), app.MQChannel, app.MQQueue)
 	c.JSON(http.StatusCreated, gin.H{"success": true})
 }
 
@@ -43,17 +42,16 @@ func (app *App) GetUser(c *gin.Context) {
 	if id == "" {
 		log.Println("Empty account id")
 	}
+	uintID, err := strconv.Atoi(id)
 
-	var account models.GetCreateAccount
-	account.Sub = id
-	err := account.Get(app.Collection)
+	user, err := models.Get(app.DB, uint(uintID))
 	if err != nil {
 		log.Println(err)
 		c.JSON(http.StatusInternalServerError, gin.H{"message": "User does not exists"})
 		return
 	}
 
-	c.JSON(http.StatusOK, account)
+	c.JSON(http.StatusOK, user)
 }
 
 func (app *App) UpdateUser(c *gin.Context) {
@@ -62,7 +60,7 @@ func (app *App) UpdateUser(c *gin.Context) {
 		log.Println("Empty account id")
 	}
 
-	var payload models.UpdateAccount
+	var payload models.UpdateUser
 	if err := c.ShouldBindJSON(&payload); err != nil {
 		log.Println(err)
 		c.JSON(http.StatusInternalServerError, gin.H{"message": err.Error()})
@@ -75,7 +73,7 @@ func (app *App) UpdateUser(c *gin.Context) {
 		return
 	}
 
-	err := models.Update(app.Collection, id, payload)
+	err := .Update(app.DB, id, payload)
 	if err != nil {
 		log.Println(err)
 		c.JSON(http.StatusInternalServerError, gin.H{"message": "Unable to update account"})

@@ -1,11 +1,15 @@
 package app
 
 import (
+	"log"
 	"time"
 
 	"github.com/gin-contrib/cache"
 	"github.com/gin-contrib/cache/persistence"
 	"github.com/gin-gonic/gin"
+	"gorm.io/driver/postgres"
+
+	"gorm.io/gorm"
 
 	amqp "github.com/rabbitmq/amqp091-go"
 )
@@ -15,14 +19,20 @@ import (
 // - "manage" - background tasks like update avatar link from filestorage service, or schedule payments etc...
 type App struct {
 	router       *gin.Engine
+	DB           *gorm.DB
 	MQConnection *amqp.Connection
 	MQChannel    *amqp.Channel
 	MQQueue      *amqp.Queue
 }
 
-func (app *App) Initialize(rabbitmq_connection string) error {
-	app.router = gin.Default()
+func (app *App) Initialize(rabbitmq_connection, database_connection string) error {
 
+	app.router = gin.Default()
+	db, err := gorm.Open(postgres.Open(database_connection), &gorm.Config{})
+	if err != nil {
+		log.Println(err)
+	}
+	app.DB = db
 	// Connect with RabbitMQ
 	mq_connection, err := connectToRabbitMQ(rabbitmq_connection)
 	if err != nil {
