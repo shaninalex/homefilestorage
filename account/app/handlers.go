@@ -8,7 +8,6 @@ import (
 	"reflect"
 
 	"github.com/gin-gonic/gin"
-	"github.com/google/uuid"
 )
 
 func Ping(c *gin.Context) {
@@ -18,7 +17,7 @@ func Ping(c *gin.Context) {
 }
 
 func (app *App) CreateUser(c *gin.Context) {
-	var newUser models.GetCreateAccount
+	var newUser models.User
 
 	if err := c.ShouldBindJSON(&newUser); err != nil {
 		log.Println(err)
@@ -26,15 +25,14 @@ func (app *App) CreateUser(c *gin.Context) {
 		return
 	}
 
-	newUser.Sub = uuid.New().String()
-	_, err := newUser.Create(app.Collection)
+	ID, err := newUser.Create(app.DB)
 	if err != nil {
 		log.Println(err)
 		c.JSON(http.StatusInternalServerError, gin.H{"message": err.Error()})
 		return
 	}
 
-	Publish("register", fmt.Sprintf("New User registered with %s id", newUser.Sub), app.MQChannel, app.MQQueue)
+	Publish("register", fmt.Sprintf("New User registered with %s id", ID), app.MQChannel, app.MQQueue)
 	c.JSON(http.StatusCreated, gin.H{"success": true})
 }
 
