@@ -6,6 +6,13 @@ import (
 	"gorm.io/gorm"
 )
 
+type UpdateUser struct {
+	Email    *string
+	Username *string
+	Active   *string
+	Password *string
+}
+
 type User struct {
 	ID        uint      `json:"id,omitempty" gorm:"primaryKey"`
 	Email     string    `json:"email" gorm:"unique"`
