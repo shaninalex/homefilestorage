@@ -9,8 +9,6 @@ import (
 type UpdateUser struct {
 	Email    *string
 	Username *string
-	Active   *string
-	Password *string
 }
 
 type User struct {
@@ -23,7 +21,7 @@ type User struct {
 	CreatedAt time.Time `json:"created_at,omitempty" gorm:"autoCreateTime"`
 }
 
-func Get(db *gorm.DB, userID uint) (*User, error) {
+func GetUser(db *gorm.DB, userID uint) (*User, error) {
 	var user User
 	if err := db.Where("id = ?", userID).First(&user).Error; err != nil {
 		return nil, err

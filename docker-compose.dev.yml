@@ -1,9 +1,20 @@
 version: '3.7'
 
 services:
+
+  account:
+    build: ./account
+    ports:
+      - "9010:9010"
+    restart: always
+    depends_on:
+      - postgres
+      - rabbitmq
+    env_file:
+      - ./account/.env.example
+
   krakend:
     image: devopsfaith/krakend
-    container_name: yiazou_krakend
     volumes:
       - ./config/krakend:/etc/krakend
     ports:
@@ -13,16 +24,18 @@ services:
   postgres:
     image: postgres:13.2
     restart: unless-stopped
-    container_name: yiazou_postgres
     volumes:
       - ./volumes/postgres:/var/lib/postgresql/data/
       - ./config/db/:/docker-entrypoint-initdb.d/
-    env_file:
-      - .env
+    ports:
+      - 5432:5432
+    environment:
+      - POSTGRES_USER=postgres
+      - POSTGRES_PASSWORD=postgres
+      - POSTGRES_DB=postgres
 
   rabbitmq:
     image: rabbitmq:3-management-alpine
-    container_name: yiazou_rabbitmq
     ports:
       - 5672:5672
       - 15672:15672
