@@ -56,4 +56,10 @@ require (
 	golang.org/x/text v0.9.0 // indirect
 	google.golang.org/protobuf v1.30.0 // indirect
 	gopkg.in/yaml.v3 v3.0.1 // indirect
+<<<<<<< HEAD
+=======
+	gorm.io/driver/postgres v1.5.0 // indirect
+	gorm.io/driver/sqlite v1.5.0 // indirect
+	gorm.io/gorm v1.25.0 // indirect
+>>>>>>> 8898747274b1392e4411946473428bf6c315fbaf
 )
