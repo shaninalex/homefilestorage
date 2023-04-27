@@ -14,6 +14,19 @@ import (
 	"github.com/h2non/filetype"
 )
 
+type File struct {
+	Id         int       `json:"id"`
+	Name       string    `json:"name"`
+	MimeType   string    `json:"mime_type"`
+	Size       int       `json:"size"`
+	SystemPath string    `json:"system_path"`
+	Owner      int       `json:"owner"`
+	Hash       string    `json:"hash"`
+	Public     bool      `json:"public"`
+	Folder     *int      `json:"folder"`
+	Created_at time.Time `json:"created_at"`
+}
+
 type FileStorage struct {
 	storage string
 }
@@ -32,7 +45,7 @@ func CreateFileStorage(path string) (*FileStorage, error) {
 	}, nil
 }
 
-func (s *FileStorage) SaveFileToStorage(file multipart.File, fileHeader *multipart.FileHeader, dFile *utils.File) (*utils.File, error) {
+func (s *FileStorage) SaveFileToStorage(file multipart.File, fileHeader *multipart.FileHeader, dFile *File) (*File, error) {
 
 	new_generated_name := fmt.Sprint(time.Now().Unix()) + filepath.Ext(fileHeader.Filename)
 
@@ -63,8 +76,15 @@ func (s *FileStorage) SaveFileToStorage(file multipart.File, fileHeader *multipa
 		return nil, err
 	}
 
-	buf, _ := ioutil.ReadFile(save_path)
-	kind, _ := filetype.Match(buf)
+	buf, err := ioutil.ReadFile(save_path)
+	if err != nil {
+		return nil, err
+	}
+
+	kind, err := filetype.Match(buf)
+	if err != nil {
+		return nil, err
+	}
 
 	if filetype.IsImage(buf) && filetype.IsDocument(buf) && filetype.IsAudio(buf) && filetype.IsArchive(buf) && filetype.IsVideo(buf) {
 		os.Remove(save_path)

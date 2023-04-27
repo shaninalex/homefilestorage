@@ -2,6 +2,9 @@
 
 ### responsibilities
 
-- retrieve/create/update/delete files
-- making storage backup ( restore backup from archive )
-- reindex ( checking the correspondence between the database and the files )
+- save and retrieve files
+- remove files if needed
+- indexing and validating
+
+
+Basicaly this service only responsible on saveing files in apropriate place and return files if needed.

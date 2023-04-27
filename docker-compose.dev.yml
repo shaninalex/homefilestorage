@@ -13,6 +13,17 @@ services:
     env_file:
       - ./account/.env.example
 
+  storage:
+    build: ./storage
+    # ports:
+    #   - "9010:9010"
+    restart: always
+    depends_on:
+      - postgres
+      - rabbitmq
+    env_file:
+      - ./storage/.env.example
+
   krakend:
     image: devopsfaith/krakend
     volumes:
