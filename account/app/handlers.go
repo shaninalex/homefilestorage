@@ -26,22 +26,14 @@ func (app *App) CreateUser(c *gin.Context) {
 		return
 	}
 
-<<<<<<< HEAD
-	result, err := newUser.Create(app.DB)
-=======
 	ID, err := newUser.Create(app.DB)
->>>>>>> 8898747274b1392e4411946473428bf6c315fbaf
 	if err != nil {
 		log.Println(err)
 		c.JSON(http.StatusInternalServerError, gin.H{"message": err.Error()})
 		return
 	}
 
-<<<<<<< HEAD
-	Publish("register", fmt.Sprintf("New User registered with %s id", result), app.MQChannel, app.MQQueue)
-=======
 	Publish("register", fmt.Sprintf("New User registered with %s id", ID), app.MQChannel, app.MQQueue)
->>>>>>> 8898747274b1392e4411946473428bf6c315fbaf
 	c.JSON(http.StatusCreated, gin.H{"success": true})
 }
 
