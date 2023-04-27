@@ -3,9 +3,11 @@ CREATE TABLE IF NOT EXISTS "users"
 (
     "id" INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL,
     "email" CHAR(256) NOT NULL UNIQUE,
-    "hashed_password" TEXT NOT NULL,
+    "username" CHAR(256) NOT NULL UNIQUE,
     "active" BOOLEAN NOT NULL DEFAULT true,
-    "created_at" DATETIME DEFAULT current_timestamp
+    "password" TEXT NOT NULL,
+    "created_at" DATETIME DEFAULT current_timestamp,
+    "updated_at" DATETIME DEFAULT current_timestamp,
 );
 
 CREATE INDEX IF NOT EXISTS "users_email_idx" ON "users" ( "email" );
