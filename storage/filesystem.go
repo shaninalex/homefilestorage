@@ -1,9 +1,8 @@
-package filesystem
+package main
 
 import (
 	"errors"
 	"fmt"
-	"homestorage/app/utils"
 	"io"
 	"io/ioutil"
 	"log"
