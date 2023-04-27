@@ -2,6 +2,8 @@ package app
 
 import (
 	"account/app/models"
+	"fmt"
+	"strconv"
 	"time"
 
 	"github.com/gin-contrib/cache"
@@ -30,24 +32,15 @@ func (app *App) Initialize(rabbitmq_connection, database_path string) error {
 	if err != nil {
 		panic("failed to connect database")
 	}
-
 	// Migrate the schema
 	db.AutoMigrate(&models.User{})
-
-	app.router = gin.Default()
-
-	app.router = gin.Default()
-	db, err := gorm.Open(postgres.Open(database_connection), &gorm.Config{})
-	if err != nil {
-		log.Println(err)
-	}
 	app.DB = db
+
 	// Connect with RabbitMQ
 	mq_connection, err := connectToRabbitMQ(rabbitmq_connection)
 	if err != nil {
 		return err
 	}
-
 	ch, err := mq_connection.Channel()
 	failOnError(err, "Failed to open a channel")
 	q, err := ch.QueueDeclare(
@@ -64,6 +57,7 @@ func (app *App) Initialize(rabbitmq_connection, database_path string) error {
 	app.MQChannel = ch
 	app.MQQueue = &q
 
+	app.router = gin.Default()
 	app.initializeRoutes()
 
 	return nil
@@ -78,6 +72,10 @@ func (app *App) initializeRoutes() {
 	app.router.DELETE("/account/:id", app.UpdateUser)
 }
 
-func (app *App) Run() {
-	app.router.Run("localhost:8000")
+func (app *App) Run(port string) {
+	portInt, err := strconv.Atoi(port)
+	if err != nil {
+		panic(err)
+	}
+	app.router.Run(fmt.Sprintf(":%d", portInt))
 }

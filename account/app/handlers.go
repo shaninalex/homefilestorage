@@ -22,18 +22,18 @@ func (app *App) CreateUser(c *gin.Context) {
 
 	if err := c.ShouldBindJSON(&newUser); err != nil {
 		log.Println(err)
-		c.JSON(http.StatusInternalServerError, gin.H{"message": err.Error()})
+		c.JSON(http.StatusBadRequest, gin.H{"message": err.Error()})
 		return
 	}
 
 	ID, err := newUser.Create(app.DB)
 	if err != nil {
 		log.Println(err)
-		c.JSON(http.StatusInternalServerError, gin.H{"message": err.Error()})
+		c.JSON(http.StatusBadRequest, gin.H{"message": err.Error()})
 		return
 	}
 
-	Publish("register", fmt.Sprintf("New User registered with %s id", ID), app.MQChannel, app.MQQueue)
+	Publish("register", fmt.Sprintf("New User registered with %v id", ID), app.MQChannel, app.MQQueue)
 	c.JSON(http.StatusCreated, gin.H{"success": true})
 }
 
@@ -43,11 +43,16 @@ func (app *App) GetUser(c *gin.Context) {
 		log.Println("Empty account id")
 	}
 	uintID, err := strconv.Atoi(id)
+	if err != nil {
+		log.Println("Cant parse id")
+		c.JSON(http.StatusNotFound, gin.H{"message": "User does not exists"})
+		return
+	}
 
-	user, err := models.Get(app.DB, uint(uintID))
+	user, err := models.GetUser(app.DB, uint(uintID))
 	if err != nil {
 		log.Println(err)
-		c.JSON(http.StatusInternalServerError, gin.H{"message": "User does not exists"})
+		c.JSON(http.StatusNotFound, gin.H{"message": "User does not exists"})
 		return
 	}
 
@@ -63,20 +68,43 @@ func (app *App) UpdateUser(c *gin.Context) {
 	var payload models.UpdateUser
 	if err := c.ShouldBindJSON(&payload); err != nil {
 		log.Println(err)
-		c.JSON(http.StatusInternalServerError, gin.H{"message": err.Error()})
+		c.JSON(http.StatusBadRequest, gin.H{"message": err.Error()})
 		return
 	}
 
 	if reflect.ValueOf(payload).IsZero() {
 		log.Println(fmt.Errorf("payload %v is empty or contain wrong values. Nothing to udpate", payload))
-		c.JSON(http.StatusInternalServerError, gin.H{"message": "Cant handle payload (empty or incorrect)"})
+		c.JSON(http.StatusBadRequest, gin.H{"message": "Cant handle payload (empty or incorrect)"})
 		return
 	}
 
-	err := .Update(app.DB, id, payload)
+	uintID, err := strconv.Atoi(id)
+	if err != nil {
+		c.JSON(http.StatusBadGateway, gin.H{"message": "Cant parse id"})
+		return
+	}
+	user, err := models.GetUser(app.DB, uint(uintID))
+	if err != nil {
+		log.Println("Cant get user id")
+		c.JSON(http.StatusNotFound, gin.H{"message": "User does not exists"})
+		return
+	}
+
+	// User itself can change only email and username since
+	// user active status and password can be changed only via
+	// special pipes - change/restore password, activate/deactivate account
+	if payload.Email != nil {
+		user.Email = *payload.Email
+	}
+
+	if payload.Username != nil {
+		user.Username = *payload.Username
+	}
+
+	err = user.Update(app.DB)
 	if err != nil {
 		log.Println(err)
-		c.JSON(http.StatusInternalServerError, gin.H{"message": "Unable to update account"})
+		c.JSON(http.StatusBadRequest, gin.H{"message": "Unable to update account"})
 		return
 	}
 	c.JSON(http.StatusOK, gin.H{"success": true})

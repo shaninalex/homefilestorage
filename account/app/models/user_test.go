@@ -32,7 +32,7 @@ func TestUserCRUD(t *testing.T) {
 	}
 
 	// Get the user by ID
-	gotUser, err := Get(db, userID)
+	gotUser, err := GetUser(db, userID)
 	if err != nil {
 		t.Fatalf("failed to get user: %v", err)
 	}
@@ -49,7 +49,7 @@ func TestUserCRUD(t *testing.T) {
 	}
 
 	// Get the user again to ensure the update was successful
-	gotUser, err = Get(db, userID)
+	gotUser, err = GetUser(db, userID)
 	if err != nil {
 		t.Fatalf("failed to get user: %v", err)
 	}
@@ -67,7 +67,7 @@ func TestUserCRUD(t *testing.T) {
 	}
 
 	// Try to get the user again to ensure it was deleted
-	_, err = Get(db, userID)
+	_, err = GetUser(db, userID)
 	if err == nil {
 		t.Fatalf("expected an error when getting deleted user, got nil")
 	}
