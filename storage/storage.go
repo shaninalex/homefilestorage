@@ -3,6 +3,7 @@ package main
 import (
 	"encoding/json"
 	"fmt"
+	"io/ioutil"
 	"net/http"
 	"strconv"
 	"time"
@@ -55,6 +56,7 @@ func (app *App) Initialize(rabbitmq_connection, storage_path string) error {
 
 func (app *App) initializeRoutes() {
 	app.router.POST("/save", app.SaveFile)
+	app.router.GET("/files/:y/:m/:d/:filename", app.RetrieveFile)
 }
 
 func (app *App) Run(port string) {
@@ -101,4 +103,19 @@ func (app *App) SaveFile(c *gin.Context) {
 	}
 	Publish(app.MQQueue.Name, string(message), app.MQChannel, app.MQQueue)
 	c.JSON(http.StatusOK, gin.H{"file": dFile})
+}
+
+func (app *App) RetrieveFile(c *gin.Context) {
+	y := c.Params.ByName("y")
+	m := c.Params.ByName("m")
+	d := c.Params.ByName("d")
+	filename := c.Params.ByName("filename")
+	file_path := fmt.Sprintf("%s/%s/%s/%s/%s", app.storage.storage, y, m, d, filename)
+	byteFile, err := ioutil.ReadFile(file_path)
+	if err != nil {
+		fmt.Println(err)
+	}
+
+	c.Header("Content-Disposition", "attachment; filename=file-name.txt")
+	c.Data(http.StatusOK, "application/pdf", byteFile)
 }
