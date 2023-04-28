@@ -15,3 +15,10 @@ Urls:
 | :-------- | :---------------------------- | :------------ |
 | POST      | `/save`                       | Save file     |
 | GET       | `/files/:y/:m/:d/:filename`   | return file   |
+
+
+Not implemented yet.
+| Method    | Path                          | Description   |
+| :-------- | :---------------------------- | :------------ |
+| GET       | `/files/:file_id`             | return file   |
+| DELETE    | `/files/:file_id`             | delete file   |
