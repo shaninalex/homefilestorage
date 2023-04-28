@@ -13,7 +13,7 @@
             "backend": [
                 {
                     "url_pattern": "/account",
-                    "encoding": "json",
+                       "encoding": "json",
                     "sd": "static",
                     "method": "POST",
                     "host": [

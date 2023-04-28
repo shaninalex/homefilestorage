@@ -10,19 +10,25 @@ services:
     depends_on:
       - postgres
       - rabbitmq
-    env_file:
-      - ./account/.env.example
+    environment:
+      - RABBITMQ_URL="amqp://guest:guest@rabbitmq:5672/"
+      - DATABASE_URL="host=postgres user=postgres password=postgres dbname=postgres port=5432 sslmode=disable"
+      - PORT=9010
 
   storage:
     build: ./storage
-    # ports:
-    #   - "9010:9010"
+    ports:
+      - "9020:9020"
     restart: always
     depends_on:
       - postgres
       - rabbitmq
-    env_file:
-      - ./storage/.env.example
+    environment:
+      - RABBITMQ_URL="amqp://guest:guest@rabbitmq:5672/"
+      - STORAGE_PATH=/files/
+      - PORT=9020
+    volumes:
+      - ./volumes/files:/files/
 
   krakend:
     image: devopsfaith/krakend

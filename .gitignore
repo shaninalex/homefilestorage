@@ -1,2 +1,3 @@
 volumes/
 config/.env.*
+config/krakend/symmetric.json
