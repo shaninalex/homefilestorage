@@ -1,6 +1,7 @@
 package main
 
 import (
+	"encoding/json"
 	"fmt"
 	"net/http"
 	"strconv"
@@ -93,7 +94,11 @@ func (app *App) SaveFile(c *gin.Context) {
 	// 	return	}
 
 	// dFile.Id = new_file_id
-
+	message, err := json.Marshal(gin.H{"message": "New file uploaded", "data": dFile})
+	if err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{"message": err.Error()})
+		return
+	}
+	Publish(app.MQQueue.Name, string(message), app.MQChannel, app.MQQueue)
 	c.JSON(http.StatusOK, gin.H{"file": dFile})
-	return
 }
