@@ -49,7 +49,7 @@ func (app *App) SaveFile(c *gin.Context) {
 	}
 
 	// resend form data into storage service
-	req, err := http.NewRequest("POST", "http://localhost:9020/save", c.Request.Body)
+	req, err := http.NewRequest("POST", fmt.Sprintf("%s/save", app.ServiceStorage), c.Request.Body)
 	if err != nil {
 		log.Println(err)
 		c.JSON(http.StatusBadRequest, gin.H{"message": err})

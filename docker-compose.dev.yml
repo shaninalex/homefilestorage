@@ -2,6 +2,22 @@ version: '3.7'
 
 services:
 
+  filemanager:
+    build: ./filemanager
+    container_name: fs_filemanager
+    ports:
+      - "9030:9030"
+    restart: always
+    depends_on:
+      - postgres
+      - rabbitmq
+    environment:
+      - RABBITMQ_URL=amqp://guest:guest@rabbitmq:5672/
+      - DATABASE_URL=host=postgres user=postgres password=postgres dbname=postgres port=5432 sslmode=disable
+      - ACCOUNT_SERVICE=http://account:9010
+      - STORAGE_SERVICE=http://storage:9020
+      - PORT=9030
+
   account:
     build: ./account
     container_name: fs_account
@@ -30,7 +46,7 @@ services:
       - STORAGE_PATH=/files/
       - PORT=9020
     volumes:
-      - ./volumes/files:/files/
+      - ./volumes/files/:/files/
 
   krakend:
     image: devopsfaith/krakend
