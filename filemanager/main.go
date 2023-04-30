@@ -8,13 +8,15 @@ import (
 
 func main() {
 	app := app.App{}
-    err := app.Initialize(
+	err := app.Initialize(
 		os.Getenv("RABBITMQ_URL"),
 		os.Getenv("DATABASE_URL"),
+		os.Getenv("ACCOUNT_SERVICE"),
+		os.Getenv("STORAGE_SERVICE"),
 	)
-    if err != nil {
-        panic(err)
-    }
+	if err != nil {
+		panic(err)
+	}
 
 	// need defer connections here, because in other case - thay close after Initialize end
 	defer app.MQConnection.Close()

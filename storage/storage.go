@@ -4,6 +4,7 @@ import (
 	"encoding/json"
 	"fmt"
 	"io/ioutil"
+	"log"
 	"net/http"
 	"strconv"
 	"time"
@@ -71,6 +72,7 @@ func (app *App) SaveFile(c *gin.Context) {
 
 	file, handler, err := c.Request.FormFile("file")
 	if err != nil {
+		log.Println(err)
 		c.JSON(http.StatusBadRequest, gin.H{"message": err.Error()})
 		return
 	}
@@ -85,6 +87,7 @@ func (app *App) SaveFile(c *gin.Context) {
 
 	dFile, err = app.storage.SaveFileToStorage(file, handler, dFile)
 	if err != nil {
+		log.Println(err)
 		c.JSON(http.StatusBadRequest, gin.H{"message": err.Error()})
 		return
 	}
@@ -98,6 +101,7 @@ func (app *App) SaveFile(c *gin.Context) {
 	// dFile.Id = new_file_id
 	message, err := json.Marshal(gin.H{"message": "New file uploaded", "data": dFile})
 	if err != nil {
+		log.Println(err)
 		c.JSON(http.StatusBadRequest, gin.H{"message": err.Error()})
 		return
 	}
@@ -113,9 +117,12 @@ func (app *App) RetrieveFile(c *gin.Context) {
 	file_path := fmt.Sprintf("%s/%s/%s/%s/%s", app.storage.storage, y, m, d, filename)
 	byteFile, err := ioutil.ReadFile(file_path)
 	if err != nil {
-		fmt.Println(err)
+		log.Println(err)
+		c.JSON(http.StatusBadRequest, gin.H{"message": err.Error()})
+		return
 	}
 
+	// ???
 	c.Header("Content-Disposition", "attachment; filename=file-name.txt")
 	c.Data(http.StatusOK, "application/pdf", byteFile)
 }
