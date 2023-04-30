@@ -3,3 +3,5 @@ start:
 
 down:
 	docker compose -f docker-compose.dev.yml down -v
+
+restart: down start
