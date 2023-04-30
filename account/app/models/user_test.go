@@ -1,77 +1,87 @@
 package models
 
 import (
+	"database/sql"
 	"testing"
 
-	"gorm.io/driver/sqlite"
-	"gorm.io/gorm"
+	_ "github.com/lib/pq"
 )
 
 func TestUserCRUD(t *testing.T) {
-	db, err := gorm.Open(sqlite.Open("file::memory:"), &gorm.Config{})
+	db, err := sql.Open("postgres", "host=localhost user=postgres password=postgres dbname=postgres port=5432 sslmode=disable")
 	if err != nil {
-		t.Fatalf("failed to connect to database: %v", err)
+		panic("failed to connect database")
 	}
 
-	// Run migrations
-	db.AutoMigrate(&User{})
-
-	// Create a new user
-	user := &User{
-		Email:    "test@example.com",
-		Username: "testuser",
+	// Create
+	u1 := &User{
+		Email:    "user1@example.com",
+		Username: "user1",
 		Active:   true,
-		Password: "password",
+		Password: "password1",
 	}
-	userID, err := user.Create(db)
+	id, err := u1.Create(db)
 	if err != nil {
-		t.Fatalf("failed to create user: %v", err)
+		t.Fatal(err)
 	}
-	if userID == 0 {
-		t.Fatalf("failed to get user ID")
+	if id == 0 {
+		t.Error("Create failed to return ID")
+	}
+	if u1.ID == 0 {
+		t.Error("Create failed to set ID")
 	}
 
-	// Get the user by ID
-	gotUser, err := GetUser(db, userID)
+	// Read
+	u2, err := GetUser(db, u1.ID)
 	if err != nil {
-		t.Fatalf("failed to get user: %v", err)
+		t.Fatal(err)
 	}
-	if gotUser.ID != userID {
-		t.Fatalf("got user with ID %d, want %d", gotUser.ID, userID)
+	if u2.Email != u1.Email {
+		t.Errorf("Expected email '%s', got '%s'", u1.Email, u2.Email)
+	}
+	if u2.Username != u1.Username {
+		t.Errorf("Expected username '%s', got '%s'", u1.Username, u2.Username)
+	}
+	if u2.Active != u1.Active {
+		t.Errorf("Expected active '%v', got '%v'", u1.Active, u2.Active)
+	}
+	if u2.Password != u1.Password {
+		t.Errorf("Expected password '%s', got '%s'", u1.Password, u2.Password)
 	}
 
-	// Update the user
-	user.Username = "newusername"
-	user.Active = false
-	err = user.Update(db)
+	// Update
+	update := &UpdateUser{
+		Email:    strPtr("new-email@example.com"),
+		Username: strPtr("new-username"),
+	}
+	u1.Email = *update.Email
+	u1.Username = *update.Username
+	err = u1.Update(db)
 	if err != nil {
-		t.Fatalf("failed to update user: %v", err)
+		t.Fatal(err)
+	}
+	u3, err := GetUser(db, u1.ID)
+	if err != nil {
+		t.Fatal(err)
+	}
+	if u3.Email != u1.Email {
+		t.Errorf("Expected email '%s', got '%s'", u1.Email, u3.Email)
+	}
+	if u3.Username != u1.Username {
+		t.Errorf("Expected username '%s', got '%s'", u1.Username, u3.Username)
 	}
 
-	// Get the user again to ensure the update was successful
-	gotUser, err = GetUser(db, userID)
+	// Delete
+	err = u1.Delete(db, u1.ID)
 	if err != nil {
-		t.Fatalf("failed to get user: %v", err)
+		t.Fatal(err)
 	}
-	if gotUser.Username != user.Username {
-		t.Fatalf("got username %s, want %s", gotUser.Username, user.Username)
-	}
-	if gotUser.Active != user.Active {
-		t.Fatalf("got active %t, want %t", gotUser.Active, user.Active)
-	}
-
-	// Delete the user
-	err = user.Delete(db, userID)
-	if err != nil {
-		t.Fatalf("failed to delete user: %v", err)
-	}
-
-	// Try to get the user again to ensure it was deleted
-	_, err = GetUser(db, userID)
+	_, err = GetUser(db, u1.ID)
 	if err == nil {
-		t.Fatalf("expected an error when getting deleted user, got nil")
+		t.Error("User was not deleted")
 	}
-	if err != gorm.ErrRecordNotFound {
-		t.Fatalf("got error %v, want %v", err, gorm.ErrRecordNotFound)
-	}
+}
+
+func strPtr(s string) *string {
+	return &s
 }
