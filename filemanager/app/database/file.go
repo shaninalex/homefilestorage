@@ -3,16 +3,16 @@ package database
 import "time"
 
 type File struct {
-	ID         uint      `json:"id,omitempty" gorm:"id"`
-	Name       string    `json:"name" gorm:"name"`
-	MimeType   string    `json:"mime_type" gorm:"mime_type"`
-	Size       uint      `json:"size" gorm:"size"`
-	SystemPath string    `json:"system_path" gorm:"system_path"`
-	Owner      uint      `json:"owner" gorm:"owner"` // foreign key to users table
-	Hash       string    `json:"hash" gorm:"hash"`
-	Public     bool      `json:"public" gorm:"public"`
-	FolderId   Folder    `json:"folder_id" gorm:"references:ID"`
-	Created_at time.Time `json:"created_at,omitempty" gorm:"created_at"`
+	ID         uint      `json:"id,omitempty"`
+	Name       string    `json:"name"`
+	MimeType   string    `json:"mime_type"`
+	Size       uint      `json:"size"`
+	SystemPath string    `json:"system_path"`
+	Owner      uint      `json:"owner"` // foreign key to users table
+	Hash       string    `json:"hash"`
+	Public     bool      `json:"public"`
+	FolderId   Folder    `json:"folder_id"`
+	Created_at time.Time `json:"created_at,omitempty"`
 }
 
 func FileSave(f *File) (*File, error) {
@@ -34,9 +34,9 @@ func GetUserFiles(user_id string, folder_id *uint) ([]File, error) {
 }
 
 type Folder struct {
-	ID        uint      `json:"id" gorm:"id"`
-	Name      string    `json:"name" gorm:"name"`
-	Color     string    `json:"color" gorm:"color"`
-	Owner     uint      `json:"owner" gorm:"owner"`
-	CreatedAt time.Time `json:"created_at" gorm:"created_at"`
+	ID        uint      `json:"id"`
+	Name      string    `json:"name"`
+	Color     string    `json:"color"`
+	Owner     uint      `json:"owner"`
+	CreatedAt time.Time `json:"created_at"`
 }
