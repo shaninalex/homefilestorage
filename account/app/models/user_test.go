@@ -12,6 +12,7 @@ func TestUserCRUD(t *testing.T) {
 	if err != nil {
 		panic("failed to connect database")
 	}
+	defer cleanDB(db)
 
 	// Create
 	u1 := &User{
@@ -84,4 +85,9 @@ func TestUserCRUD(t *testing.T) {
 
 func strPtr(s string) *string {
 	return &s
+}
+
+func cleanDB(db *sql.DB) {
+	db.Exec(`DELETE FROM users`)
+	db.Close()
 }
