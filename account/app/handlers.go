@@ -42,14 +42,14 @@ func (app *App) GetUser(c *gin.Context) {
 	if id == "" {
 		log.Println("Empty account id")
 	}
-	uintID, err := strconv.Atoi(id)
+	intID, err := strconv.Atoi(id)
 	if err != nil {
 		log.Println("Cant parse id")
 		c.JSON(http.StatusNotFound, gin.H{"message": "User does not exists"})
 		return
 	}
 
-	user, err := models.GetUser(app.DB, uint(uintID))
+	user, err := models.GetUser(app.DB, int64(intID))
 	if err != nil {
 		log.Println(err)
 		c.JSON(http.StatusNotFound, gin.H{"message": "User does not exists"})
@@ -78,12 +78,12 @@ func (app *App) UpdateUser(c *gin.Context) {
 		return
 	}
 
-	uintID, err := strconv.Atoi(id)
+	intID, err := strconv.Atoi(id)
 	if err != nil {
 		c.JSON(http.StatusBadGateway, gin.H{"message": "Cant parse id"})
 		return
 	}
-	user, err := models.GetUser(app.DB, uint(uintID))
+	user, err := models.GetUser(app.DB, int64(intID))
 	if err != nil {
 		log.Println("Cant get user id")
 		c.JSON(http.StatusNotFound, gin.H{"message": "User does not exists"})

@@ -1,7 +1,7 @@
 package app
 
 import (
-	"account/app/models"
+	"database/sql"
 	"fmt"
 	"strconv"
 	"time"
@@ -9,10 +9,8 @@ import (
 	"github.com/gin-contrib/cache"
 	"github.com/gin-contrib/cache/persistence"
 	"github.com/gin-gonic/gin"
-	"gorm.io/gorm"
 
-	"gorm.io/driver/postgres"
-
+	_ "github.com/lib/pq"
 	amqp "github.com/rabbitmq/amqp091-go"
 )
 
@@ -21,19 +19,17 @@ import (
 // - "manage" - background tasks like update avatar link from filestorage service, or schedule payments etc...
 type App struct {
 	router       *gin.Engine
-	DB           *gorm.DB
+	DB           *sql.DB
 	MQConnection *amqp.Connection
 	MQChannel    *amqp.Channel
 	MQQueue      *amqp.Queue
 }
 
 func (app *App) Initialize(rabbitmq_connection, database_path string) error {
-	db, err := gorm.Open(postgres.Open(database_path), &gorm.Config{})
+	db, err := sql.Open("postgres", database_path)
 	if err != nil {
 		panic("failed to connect database")
 	}
-	// Migrate the schema
-	db.AutoMigrate(&models.User{})
 	app.DB = db
 
 	// Connect with RabbitMQ
