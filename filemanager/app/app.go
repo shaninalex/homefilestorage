@@ -1,6 +1,7 @@
 package app
 
 import (
+	"database/sql"
 	"fmt"
 	"strconv"
 	"time"
@@ -8,15 +9,13 @@ import (
 	"github.com/gin-contrib/cache"
 	"github.com/gin-contrib/cache/persistence"
 	"github.com/gin-gonic/gin"
+	_ "github.com/lib/pq"
 	amqp "github.com/rabbitmq/amqp091-go"
-	"github.com/shaninalex/homefilestorage/filemanger/app/database"
-	"gorm.io/driver/postgres"
-	"gorm.io/gorm"
 )
 
 type App struct {
 	router         *gin.Engine
-	DB             *gorm.DB
+	DB             *sql.DB
 	MQConnection   *amqp.Connection
 	MQChannel      *amqp.Channel
 	MQQueue        *amqp.Queue
@@ -25,11 +24,10 @@ type App struct {
 }
 
 func (app *App) Initialize(rabbitmq_connection, database_path, account_service_url, storage_service_url string) error {
-	db, err := gorm.Open(postgres.Open(database_path), &gorm.Config{})
+	db, err := sql.Open("postgres", database_path)
 	if err != nil {
 		return err
 	}
-	db.AutoMigrate(&database.Folder{}, &database.File{})
 	app.DB = db
 
 	// Connect with RabbitMQ
@@ -40,12 +38,12 @@ func (app *App) Initialize(rabbitmq_connection, database_path, account_service_u
 	ch, err := mq_connection.Channel()
 	failOnError(err, "Failed to open a channel")
 	q, err := ch.QueueDeclare(
-		"register", // name
-		false,      // durable
-		false,      // delete when unused
-		false,      // exclusive
-		false,      // no-wait
-		nil,        // arguments
+		"storage", // name
+		false,     // durable
+		false,     // delete when unused
+		false,     // exclusive
+		false,     // no-wait
+		nil,       // arguments
 	)
 	failOnError(err, "Failed to declare a queue")
 

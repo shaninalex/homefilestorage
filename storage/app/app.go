@@ -97,7 +97,7 @@ func (app *App) SaveFile(c *gin.Context) {
 		return
 	}
 	Publish(app.MQQueue.Name, string(message), app.MQChannel, app.MQQueue)
-	c.JSON(http.StatusOK, gin.H{"file": dFile})
+	c.JSON(http.StatusOK, dFile)
 }
 
 func (app *App) RetrieveFile(c *gin.Context) {
