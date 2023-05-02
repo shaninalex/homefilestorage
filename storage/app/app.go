@@ -1,9 +1,8 @@
-package main
+package app
 
 import (
 	"encoding/json"
 	"fmt"
-	"io/ioutil"
 	"log"
 	"net/http"
 	"strconv"
@@ -81,7 +80,6 @@ func (app *App) SaveFile(c *gin.Context) {
 	dFile := &File{
 		Size:       int(handler.Size),
 		Name:       handler.Filename,
-		Public:     true,
 		Created_at: time.Now(),
 	}
 
@@ -92,13 +90,6 @@ func (app *App) SaveFile(c *gin.Context) {
 		return
 	}
 
-	// new_file_id, err := app.db.SaveFileRecord(dFile)
-
-	// if err != nil {
-	// 	c.JSON(http.StatusBadRequest, gin.H{"message": err.Error()})
-	// 	return	}
-
-	// dFile.Id = new_file_id
 	message, err := json.Marshal(gin.H{"message": "New file uploaded", "data": dFile})
 	if err != nil {
 		log.Println(err)
@@ -115,14 +106,5 @@ func (app *App) RetrieveFile(c *gin.Context) {
 	d := c.Params.ByName("d")
 	filename := c.Params.ByName("filename")
 	file_path := fmt.Sprintf("%s/%s/%s/%s/%s", app.storage.storage, y, m, d, filename)
-	byteFile, err := ioutil.ReadFile(file_path)
-	if err != nil {
-		log.Println(err)
-		c.JSON(http.StatusBadRequest, gin.H{"message": err.Error()})
-		return
-	}
-
-	// ???
-	c.Header("Content-Disposition", "attachment; filename=file-name.txt")
-	c.Data(http.StatusOK, "application/pdf", byteFile)
+	c.FileAttachment(file_path, filename)
 }
