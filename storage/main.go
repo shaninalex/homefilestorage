@@ -2,10 +2,12 @@ package main
 
 import (
 	"os"
+
+	"github.com/shaninalex/homefilestorage/storage/app"
 )
 
 func main() {
-	app := App{}
+	app := app.App{}
 	app.Initialize(
 		os.Getenv("RABBITMQ_URL"),
 		os.Getenv("STORAGE_PATH"),
