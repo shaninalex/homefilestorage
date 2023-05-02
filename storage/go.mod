@@ -1,4 +1,4 @@
-module storage
+module github.com/shaninalex/homefilestorage/storage
 
 go 1.20
 

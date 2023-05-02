@@ -1,4 +1,4 @@
-package main
+package app
 
 import (
 	"context"
@@ -19,7 +19,7 @@ func Publish(queue, message string, ch *amqp.Channel, q *amqp.Queue) {
 		false,  // mandatory
 		false,  // immediate
 		amqp.Publishing{
-			ContentType: "text/plain",
+			ContentType: "application/json",
 			Body:        []byte(message),
 		})
 	failOnError(err, "Failed to publish a message")
