@@ -1,6 +1,10 @@
 package database
 
-import "time"
+import (
+	"database/sql"
+	"log"
+	"time"
+)
 
 type File struct {
 	ID         uint      `json:"id,omitempty"`
@@ -11,12 +15,22 @@ type File struct {
 	Owner      uint      `json:"owner"` // foreign key to users table
 	Hash       string    `json:"hash"`
 	Public     bool      `json:"public"`
-	FolderId   Folder    `json:"folder_id"`
+	FolderId   uint      `json:"folder_id"`
 	Created_at time.Time `json:"created_at,omitempty"`
 }
 
-func FileSave(f *File) (*File, error) {
-	return nil, nil
+func (f *File) FileSave(db *sql.DB) error {
+	err := db.QueryRow(`
+		INSERT INTO files (name, mime_type, size, system_path, user_id, hash, public, folder) 
+		VALUES ( $1, $2, $3, $4, $5, $6, $7, $8 ) RETURNING id`,
+		f.Name, f.MimeType, f.Size, f.SystemPath, f.Owner, f.Hash, f.Public, f.FolderId,
+	).Scan(&f.ID)
+	if err != nil {
+		log.Println(err)
+		return err
+	}
+
+	return nil
 }
 
 func FileGet(id string) (*File, error) {
