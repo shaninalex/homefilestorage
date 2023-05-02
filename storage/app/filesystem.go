@@ -1,4 +1,4 @@
-package main
+package app
 
 import (
 	"errors"
@@ -15,15 +15,11 @@ import (
 )
 
 type File struct {
-	Id         int       `json:"id"`
 	Name       string    `json:"name"`
 	MimeType   string    `json:"mime_type"`
 	Size       int       `json:"size"`
 	SystemPath string    `json:"system_path"`
-	Owner      int       `json:"owner"`
 	Hash       string    `json:"hash"`
-	Public     bool      `json:"public"`
-	Folder     *int      `json:"folder"`
 	Created_at time.Time `json:"created_at"`
 }
 
