@@ -15,12 +15,11 @@ import (
 )
 
 type File struct {
-	Name       string    `json:"name"`
-	MimeType   string    `json:"mime_type"`
-	Size       int       `json:"size"`
-	SystemPath string    `json:"system_path"`
-	Hash       string    `json:"hash"`
-	Created_at time.Time `json:"created_at"`
+	Name       string `json:"name"`
+	MimeType   string `json:"mime_type"`
+	Size       int    `json:"size"`
+	SystemPath string `json:"system_path"`
+	Hash       string `json:"hash"`
 }
 
 type FileStorage struct {

@@ -22,9 +22,9 @@ type File struct {
 func (f *File) FileSave(db *sql.DB) error {
 	err := db.QueryRow(`
 		INSERT INTO files (name, mime_type, size, system_path, user_id, hash, public, folder) 
-		VALUES ( $1, $2, $3, $4, $5, $6, $7, $8 ) RETURNING id`,
+		VALUES ( $1, $2, $3, $4, $5, $6, $7, $8 ) RETURNING id, created_at`,
 		f.Name, f.MimeType, f.Size, f.SystemPath, f.Owner, f.Hash, f.Public, f.FolderId,
-	).Scan(&f.ID)
+	).Scan(&f.ID, &f.Created_at)
 	if err != nil {
 		log.Println(err)
 		return err

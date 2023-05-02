@@ -7,19 +7,17 @@ import (
 	"log"
 	"net/http"
 	"strconv"
-	"time"
 
 	"github.com/gin-gonic/gin"
 	"github.com/shaninalex/homefilestorage/filemanger/app/database"
 )
 
 type FileResponse struct {
-	Name       string    `json:"name"`
-	MimeType   string    `json:"mime_type"`
-	Size       uint      `json:"size"`
-	SystemPath string    `json:"system_path"`
-	Hash       string    `json:"hash"`
-	Created_at time.Time `json:"created_at"`
+	Name       string `json:"name"`
+	MimeType   string `json:"mime_type"`
+	Size       uint   `json:"size"`
+	SystemPath string `json:"system_path"`
+	Hash       string `json:"hash"`
 }
 
 func Health(c *gin.Context) {
@@ -104,7 +102,6 @@ func (app *App) SaveFile(c *gin.Context) {
 	file.Size = responseStorage.Size
 	file.SystemPath = responseStorage.SystemPath
 	file.Hash = responseStorage.Hash
-	file.Created_at = responseStorage.Created_at
 	file.Owner = uint(userIdUint)
 	file.Public = true
 
