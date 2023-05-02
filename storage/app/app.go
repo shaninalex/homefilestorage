@@ -6,7 +6,6 @@ import (
 	"log"
 	"net/http"
 	"strconv"
-	"time"
 
 	"github.com/gin-gonic/gin"
 	amqp "github.com/rabbitmq/amqp091-go"
@@ -78,9 +77,8 @@ func (app *App) SaveFile(c *gin.Context) {
 	defer file.Close()
 
 	dFile := &File{
-		Size:       int(handler.Size),
-		Name:       handler.Filename,
-		Created_at: time.Now(),
+		Size: int(handler.Size),
+		Name: handler.Filename,
 	}
 
 	dFile, err = app.storage.SaveFileToStorage(file, handler, dFile)
