@@ -62,6 +62,39 @@
                     }
                 }
             ]
+        },
+        {
+            "endpoint": "/api/v2/files/upload",
+            "method": "POST",
+            "output_encoding": "json",
+            "extra_config": {
+                "auth/validator": {
+                    "alg": "HS256",
+                    "audience": ["http://api.example.com"],
+                    "roles_key": "roles",
+                    "issuer": "https://krakend.io",
+                    "roles": ["user"],
+                    "jwk_local_path": "symmetric.json",
+                    "disable_jwk_security": true
+                },
+                "qos/ratelimit/router": {
+                    "max_rate": 50,
+                    "client_max_rate": 20,
+                    "strategy": "ip"
+                }
+            },
+            "backend": [
+                {
+                    "url_pattern": "/{JWT.sub}/save-file",
+                    "sd": "static",
+                    "method": "POST",
+                    "host": [
+                        "http://filemanager:9030"
+                    ],
+                    "disable_host_sanitize": false
+
+                }
+            ]
         }
     ]
 }

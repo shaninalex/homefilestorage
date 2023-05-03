@@ -43,9 +43,9 @@ func GetUser(db *sql.DB, userID int64) (*User, error) {
 }
 
 func (u *User) Create(db *sql.DB) (int64, error) {
-
-	err := db.QueryRow(
-		`INSERT INTO users (email, username, active, password) VALUES ($1, $2, $3, $4) RETURNING id;`,
+	err := db.QueryRow(`
+		INSERT INTO users (email, username, active, password) 
+		VALUES ($1, $2, $3, $4) RETURNING id`,
 		u.Email, u.Username, u.Active, u.Password,
 	).Scan(&u.ID)
 	if err != nil {
