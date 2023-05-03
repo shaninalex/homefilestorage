@@ -25,7 +25,14 @@ func (app *App) CreateUser(c *gin.Context) {
 		c.JSON(http.StatusBadRequest, gin.H{"message": err.Error()})
 		return
 	}
+	encodedHash, err := generateFromPassword(newUser.Password, p)
+	if err != nil {
+		log.Println(err)
+		c.JSON(http.StatusInternalServerError, gin.H{"message": err.Error()})
+		return
+	}
 
+	newUser.Password = encodedHash
 	ID, err := newUser.Create(app.DB)
 	if err != nil {
 		log.Println(err)
