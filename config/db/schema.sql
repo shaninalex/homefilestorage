@@ -2,8 +2,8 @@
 CREATE TABLE IF NOT EXISTS "users"
 (
     "id" SERIAL,
-    "email" CHAR(256) NOT NULL UNIQUE,
-    "username" CHAR(256) NOT NULL UNIQUE,
+    "email" TEXT NOT NULL UNIQUE,
+    "username" TEXT NOT NULL UNIQUE,
     "active" BOOLEAN NOT NULL DEFAULT true,
     "password" TEXT NOT NULL,
     "created_at" TIMESTAMP DEFAULT current_timestamp,
@@ -17,10 +17,10 @@ CREATE INDEX IF NOT EXISTS "users_email_idx" ON "users" ( "email" );
 CREATE TABLE IF NOT EXISTS "files"
 (
     "id" SERIAL,
-    "name" CHAR(256) NOT NULL,
-    "mime_type" CHAR(128) NOT NULL,
+    "name" TEXT NOT NULL,
+    "mime_type" TEXT NOT NULL,
     "size" INTEGER NOT NULL,
-    "system_path" CHAR(256),
+    "system_path" TEXT,
     "user_id" INTEGER NOT NULL,
     "hash" TEXT NOT NULL,
     "public" BOOLEAN NOT NULL DEFAULT true,
@@ -37,8 +37,8 @@ CREATE INDEX IF NOT EXISTS "files_name_idx" ON "files" ( "name" );
 CREATE TABLE IF NOT EXISTS "folders"
 (
     "id" SERIAL,
-    "name" CHAR(256) NOT NULL,
-    "color" CHAR(256) NOT NULL,
+    "name" TEXT NOT NULL,
+    "color" TEXT NOT NULL,
     "user_id" INTEGER NOT NULL,
     "created_at" TIMESTAMP DEFAULT current_timestamp,
     PRIMARY KEY (id),
