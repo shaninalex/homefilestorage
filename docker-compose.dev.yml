@@ -2,9 +2,23 @@ version: '3.7'
 
 services:
 
+  auth:
+    build: ./auth
+    ports:
+      - "9040:9040"
+    restart: always
+    depends_on:
+      - postgres
+      - rabbitmq
+    environment:
+      - AUT_DATABASE_URL=host=postgres user=postgres password=postgres dbname=postgres port=5432 sslmode=disable
+      - AUT_BROKER_URL=amqp://guest:guest@rabbitmq:5672/
+      - AUT_PORT=9040
+      - AUT_AUD=http://api.example.com
+      - AUT_ISS=https://krakend.io
+
   filemanager:
     build: ./filemanager
-    container_name: fs_filemanager
     ports:
       - "9030:9030"
     restart: always
@@ -20,7 +34,6 @@ services:
 
   account:
     build: ./account
-    container_name: fs_account
     ports:
       - "9010:9010"
     restart: always
@@ -34,7 +47,6 @@ services:
 
   storage:
     build: ./storage
-    container_name: fs_storage
     ports:
       - "9020:9020"
     restart: always
