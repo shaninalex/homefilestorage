@@ -17,7 +17,7 @@ import (
 type AccessToken struct {
 	Aud   string   `json:"aud"`
 	Iss   string   `json:"iss"`
-	Sub   int64    `json:"sub"`
+	Sub   string   `json:"sub"`
 	Jti   string   `json:"jti"`
 	Roles []string `json:"roles"`
 	Exp   int64    `json:"exp"`
@@ -33,6 +33,11 @@ type LoginPayload struct {
 	Password string `json:"password"`
 }
 
+type DBQueryRequestPayload struct {
+	ID       int64
+	Password string
+}
+
 var (
 	ErrorDefault            = errors.New("something went wrong")
 	ErrorPasswordMismatched = errors.New("password mismatched")
@@ -41,47 +46,50 @@ var (
 )
 
 type App struct {
-	router  *gin.Engine
+	Router  *gin.Engine
+	DB      *sql.DB
 	AuthAud string
 	AuthIss string
-	DB      *sql.DB
 }
 
-func (app *App) initialize(dbURL, brokerURL, auth_aud, auth_iss string) {
-
-	db, err := sql.Open("postgres", dbURL)
+func (a *App) initialize(dbURL, brokerURL, auth_aud, auth_iss string) {
+	var err error
+	a.DB, err = sql.Open("postgres", dbURL)
 	if err != nil {
-		log.Println(err)
-		panic("failed to connect database")
+		log.Fatal(err)
+	} else {
+		log.Println("Connected to Postgres")
 	}
-	app.DB = db
-	app.router = gin.Default()
-	app.AuthAud = auth_aud
-	app.AuthIss = auth_iss
-	app.initializeRoutes()
+
+	a.Router = gin.Default()
+	a.AuthAud = auth_aud
+	a.AuthIss = auth_iss
+
+	a.initializeRoutes()
 }
 
-func (app *App) Run(port string) {
-	portInt, err := strconv.Atoi(port)
+func (a *App) Run(port string) {
+	log.Printf("Listen port: %s\n", port)
+	port_int, err := strconv.Atoi(port)
 	if err != nil {
-		panic(err)
+		log.Fatal(err)
 	}
-	app.router.Run(fmt.Sprintf(":%d", portInt))
+	addr := fmt.Sprintf(":%d", port_int)
+	log.Fatal(http.ListenAndServe(addr, a.Router))
 }
 
-func (app *App) ObtainToken(c *gin.Context) {
+func (a *App) obtainToken(c *gin.Context) {
 	var auth_payload LoginPayload
-
 	err := c.ShouldBindJSON(&auth_payload)
 	if err != nil {
-		log.Println(err)
 		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
 		return
 	}
+
 	var password string
 	var id int64
 	sql := "SELECT id, password FROM users WHERE email = $1"
-	row := app.DB.QueryRow(sql, auth_payload.Email)
+	row := a.DB.QueryRow(sql, auth_payload.Email)
 	err = row.Scan(&id, &password)
 
 	if err != nil {
@@ -103,25 +111,29 @@ func (app *App) ObtainToken(c *gin.Context) {
 		return
 	}
 
-	exp_timestamp := time.Now().Add(time.Hour * 24 * 7) // 3 days
+	current := time.Now().Add(time.Minute * 15)
 
 	payload := AuthPayload{
 		AccessToken: AccessToken{
-			Aud:   app.AuthAud,
-			Iss:   app.AuthIss,
-			Sub:   id,
+			Aud:   a.AuthAud,
+			Iss:   a.AuthIss,
+			Sub:   strconv.Itoa(int(id)),
 			Jti:   randomString(38),
-			Roles: []string{"user"},
-			Exp:   exp_timestamp.Unix(),
+			Roles: []string{"user", "admin"},
+			Exp:   current.Unix(),
 		},
-		Exp: exp_timestamp.Unix(),
+		Exp: current.Unix(),
 	}
 
-	c.JSON(http.StatusCreated, payload)
+	c.JSON(http.StatusOK, payload)
+	if err != nil {
+		log.Println(err)
+		return
+	}
 }
 
-func (app *App) initializeRoutes() {
-	app.router.POST("/obtain", app.ObtainToken)
+func (a *App) initializeRoutes() {
+	a.Router.POST("/obtain", a.obtainToken)
 }
 
 // HELPERS
