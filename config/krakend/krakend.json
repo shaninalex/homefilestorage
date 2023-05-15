@@ -134,9 +134,45 @@
             },
             "backend": [
                 {
-                    "url_pattern": "/{JWT.sub}/save-file",
+                    "url_pattern": "/user/{JWT.sub}/save-file",
                     "sd": "static",
                     "method": "POST",
+                    "host": [
+                        "http://filemanager:9030"
+                    ],
+                    "disable_host_sanitize": false
+                }
+            ]
+        },
+        {
+            "endpoint": "/api/v2/file/{id}",
+            "method": "GET",
+            "output_encoding": "no-op",
+            "extra_config": {
+                "auth/validator": {
+                    "alg": "HS256",
+                    "audience": [
+                        "http://api.example.com"
+                    ],
+                    "roles_key": "roles",
+                    "issuer": "https://krakend.io",
+                    "roles": [
+                        "user"
+                    ],
+                    "jwk_local_path": "symmetric.json",
+                    "disable_jwk_security": true
+                },
+                "qos/ratelimit/router": {
+                    "max_rate": 50,
+                    "client_max_rate": 20,
+                    "strategy": "ip"
+                }
+            },
+            "backend": [
+                {
+                    "url_pattern": "/user/{JWT.sub}/file/{id}",
+                    "sd": "static",
+                    "method": "GET",
                     "host": [
                         "http://filemanager:9030"
                     ],
