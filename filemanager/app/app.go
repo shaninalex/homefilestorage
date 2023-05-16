@@ -4,10 +4,7 @@ import (
 	"database/sql"
 	"fmt"
 	"strconv"
-	"time"
 
-	"github.com/gin-contrib/cache"
-	"github.com/gin-contrib/cache/persistence"
 	"github.com/gin-gonic/gin"
 	_ "github.com/lib/pq"
 	amqp "github.com/rabbitmq/amqp091-go"
@@ -57,13 +54,15 @@ func (app *App) Initialize(rabbitmq_connection, database_path, account_service_u
 	app.initializeRoutes()
 	return nil
 }
+
 func (app *App) initializeRoutes() {
-	store := persistence.NewInMemoryStore(time.Minute)
+	// store := persistence.NewInMemoryStore(time.Minute)
 	app.router.GET("/_health", Health)
 
 	actionsGroupUser := app.router.Group("/user")
 	{
-		actionsGroupUser.GET("/:user_id/file/:id", cache.CachePage(store, time.Minute, app.GetFile))
+		actionsGroupUser.GET("/:user_id/files", app.GetFiles)
+		actionsGroupUser.GET("/:user_id/file/:id", app.SingleFile)
 		actionsGroupUser.POST("/:user_id/save-file", app.SaveFile)
 	}
 }

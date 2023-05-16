@@ -57,7 +57,7 @@ func (u *User) Create(db *sql.DB) (int64, error) {
 
 func (u *User) Update(db *sql.DB) error {
 	res, err := db.Exec(
-		`UPDATE users SET email = $1, Username = $2 WHERE id = $3`,
+		`UPDATE users SET email = $1, username = $2 WHERE id = $3`,
 		u.Email, u.Username, u.ID,
 	)
 	if err != nil {

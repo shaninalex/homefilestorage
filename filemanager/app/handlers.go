@@ -31,10 +31,31 @@ func Health(c *gin.Context) {
 // - file_id - the id of file he want to get
 // If user hase right permissions and file exist function return
 // the file itseld
-func (app *App) GetFile(c *gin.Context) {
-	c.JSON(http.StatusOK, gin.H{
-		"status": "ok",
-	})
+func (app *App) SingleFile(c *gin.Context) {
+	file_id, _ := c.Params.Get("id")
+	user_id, _ := c.Params.Get("user_id")
+	file_id_int, _ := strconv.Atoi(file_id)
+	user_id_int, _ := strconv.Atoi(user_id)
+	file, err := database.GetFile(app.DB, int64(user_id_int), int64(file_id_int))
+	if err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{"error": err})
+	}
+	c.JSON(http.StatusOK, gin.H{"file": file})
+}
+
+// This api handler get
+// - user_id from JWT ( unpacked by krakend )
+// - file_id - the id of file he want to get
+// If user hase right permissions and file exist function return
+// the file itseld
+func (app *App) GetFiles(c *gin.Context) {
+	user_id, _ := c.Params.Get("user_id")
+	folder_id, _ := strconv.Atoi(c.Query("folder_id"))
+	files, err := database.GetUserFiles(app.DB, user_id, int64(folder_id))
+	if err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{"error": err})
+	}
+	c.JSON(http.StatusOK, gin.H{"files": files})
 }
 
 // To save the file user should provide:
@@ -114,5 +135,5 @@ func (app *App) SaveFile(c *gin.Context) {
 
 	Publish(app.MQQueue.Name, fmt.Sprintf("New file saved from user: %s", user_id), app.MQChannel, app.MQQueue)
 
-	c.JSON(http.StatusOK, file)
+	c.JSON(http.StatusOK, gin.H{"file": file})
 }
