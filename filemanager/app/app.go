@@ -64,6 +64,7 @@ func (app *App) initializeRoutes() {
 		actionsGroupUser.GET("/:user_id/files", app.GetFiles)
 		actionsGroupUser.GET("/:user_id/file/:id", app.SingleFile)
 		actionsGroupUser.POST("/:user_id/save-file", app.SaveFile)
+		actionsGroupUser.GET("/:user_id/file-data/:file_id", app.FileData)
 	}
 }
 

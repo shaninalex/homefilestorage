@@ -3,6 +3,7 @@ package app
 import (
 	"encoding/json"
 	"fmt"
+	"io"
 	"io/ioutil"
 	"log"
 	"net/http"
@@ -136,4 +137,39 @@ func (app *App) SaveFile(c *gin.Context) {
 	Publish(app.MQQueue.Name, fmt.Sprintf("New file saved from user: %s", user_id), app.MQChannel, app.MQQueue)
 
 	c.JSON(http.StatusOK, gin.H{"file": file})
+}
+
+func (app *App) FileData(c *gin.Context) {
+	file_id, _ := c.Params.Get("file_id")
+	user_id, _ := c.Params.Get("user_id")
+	file_id_int, _ := strconv.Atoi(file_id)
+	user_id_int, _ := strconv.Atoi(user_id)
+
+	file, err := database.GetFile(app.DB, int64(user_id_int), int64(file_id_int))
+	if err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
+	}
+
+	log.Printf("%s%s\n", app.ServiceStorage, file.SystemPath)
+
+	var fileBody io.Reader
+	req, err := http.NewRequest("GET", fmt.Sprintf("%s%s", app.ServiceStorage, file.SystemPath), fileBody)
+	if err != nil {
+		log.Println(err)
+		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
+		return
+	}
+
+	client := &http.Client{}
+	resp, err := client.Do(req)
+	if err != nil {
+		log.Println(err)
+		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
+		return
+	}
+	defer resp.Body.Close()
+
+	fileBites, _ := ioutil.ReadAll(resp.Body)
+
+	c.Data(http.StatusOK, file.MimeType, fileBites)
 }
