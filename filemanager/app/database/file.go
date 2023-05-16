@@ -33,18 +33,47 @@ func (f *File) FileSave(db *sql.DB) error {
 	return nil
 }
 
-func FileGet(id string) (*File, error) {
-	return nil, nil
+func GetFile(db *sql.DB, user_id int64, file_id int64) (*File, error) {
+	var file File
+	err := db.QueryRow(`SELECT * FROM files WHERE id = $1 AND user_id = $2`,
+		file_id, user_id).Scan(
+		&file.ID, &file.Name, &file.MimeType, &file.Size, &file.SystemPath,
+		&file.Owner, &file.Hash, &file.Public, &file.FolderId, &file.Created_at,
+	)
+	if err != nil {
+		return nil, err
+	}
+	return &file, nil
 }
 
 func FileDelete(id string) (*File, error) {
+	// delete from database
 	// rabbitmq request to storage to delete file
 	return nil, nil
 }
 
-func GetUserFiles(user_id string, folder_id *uint) ([]File, error) {
-	// If folder_id == nil -> it's root directory.
-	return nil, nil
+func GetUserFiles(db *sql.DB, user_id string, folder_id int64) ([]File, error) {
+	rows, err := db.Query(`SELECT * FROM files WHERE user_id = $1 AND folder = $2`, user_id, folder_id)
+	if err != nil {
+		return nil, err
+	}
+	defer rows.Close()
+
+	var files []File
+	for rows.Next() {
+		var file File
+		if err := rows.Scan(
+			&file.ID, &file.Name, &file.MimeType, &file.Size, &file.SystemPath,
+			&file.Owner, &file.Hash, &file.Public, &file.FolderId, &file.Created_at,
+		); err != nil {
+			return files, err
+		}
+		files = append(files, file)
+	}
+	if err = rows.Err(); err != nil {
+		return files, err
+	}
+	return files, nil
 }
 
 type Folder struct {
