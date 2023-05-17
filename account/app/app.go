@@ -65,7 +65,7 @@ func (app *App) initializeRoutes() {
 	app.router.POST("/account", app.CreateUser)
 	app.router.GET("/account/:id", cache.CachePage(store, time.Minute, app.GetUser))
 	app.router.PATCH("/account/:id", app.UpdateUser)
-	app.router.DELETE("/account/:id", app.UpdateUser)
+	// app.router.DELETE("/account/:id", app.DeleteUser)
 }
 
 func (app *App) Run(port string) {
