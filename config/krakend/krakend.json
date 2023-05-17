@@ -109,6 +109,42 @@
             }
         },
         {
+            "endpoint": "/api/v2/account",
+            "method": "PATCH",
+            "output_encoding": "json",
+            "extra_config": {
+                "auth/validator": {
+                    "alg": "HS256",
+                    "audience": [
+                        "http://api.example.com"
+                    ],
+                    "roles_key": "roles",
+                    "issuer": "https://krakend.io",
+                    "roles": [
+                        "user"
+                    ],
+                    "jwk_local_path": "symmetric.json",
+                    "disable_jwk_security": true
+                },
+                "qos/ratelimit/router": {
+                    "max_rate": 50,
+                    "client_max_rate": 20,
+                    "strategy": "ip"
+                }
+            },
+            "backend": [
+                {
+                    "url_pattern": "/account/{JWT.sub}",
+                    "sd": "static",
+                    "method": "PATCH",
+                    "host": [
+                        "http://account:9010"
+                    ],
+                    "disable_host_sanitize": false
+                }
+            ]
+        },
+        {
             "endpoint": "/api/v2/files/upload",
             "method": "POST",
             "output_encoding": "json",
