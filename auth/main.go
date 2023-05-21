@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"log"
 	"os"
+	"strconv"
 
 	"github.com/gin-gonic/gin"
 	client "github.com/ory/client-go"
@@ -24,9 +25,10 @@ func main() {
 	apiClient := client.NewAPIClient(configuration)
 
 	router := gin.Default()
-	router.GET("/test", func(c *gin.Context) {
+	router.GET("/identity", func(c *gin.Context) {
 		cookie, err := c.Cookie(COOCKIE_NAME)
 		if err != nil {
+			log.Println(err)
 			c.JSON(401, gin.H{
 				"error": "unauthorized",
 			})
@@ -54,5 +56,9 @@ func main() {
 		c.JSON(200, resp.Identity.Traits)
 	})
 
-	router.Run()
+	portInt, err := strconv.Atoi(os.Getenv("PORT"))
+	if err != nil {
+		panic(err)
+	}
+	router.Run(fmt.Sprintf(":%d", portInt))
 }
