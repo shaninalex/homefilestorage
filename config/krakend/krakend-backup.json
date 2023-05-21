@@ -1,0 +1,295 @@
+{
+    "$schema": "https://www.krakend.io/schema/v3.json",
+    "version": 3,
+    "name": "KrakenD - API Gateway",
+    "timeout": "3000ms",
+    "cache_ttl": "300s",
+    "output_encoding": "json",
+    "endpoints": [
+        {
+            "endpoint": "/api/v2/register",
+            "method": "POST",
+            "output_encoding": "json",
+            "backend": [
+                {
+                    "url_pattern": "/account",
+                    "encoding": "json",
+                    "sd": "static",
+                    "method": "POST",
+                    "host": [
+                        "http://account:9010"
+                    ],
+                    "disable_host_sanitize": false,
+                    "deny": [
+                        "password",
+                        "updated_at",
+                        "created_at"
+                    ],
+                    "extra_config": {
+                        "backend/http": {
+                            "return_error_code": true
+                        }
+                    }
+                }
+            ]
+        },
+        {
+            "endpoint": "/api/v2/login",
+            "method": "POST",
+            "extra_config": {
+                "auth/signer": {
+                    "alg": "HS256",
+                    "kid": "sim2",
+                    "keys_to_sign": [
+                        "access_token"
+                    ],
+                    "jwk_local_path": "symmetric.json",
+                    "disable_jwk_security": true
+                }
+            },
+            "backend": [
+                {
+                    "url_pattern": "/obtain",
+                    "method": "POST",
+                    "encoding": "json",
+                    "host": [
+                        "http://auth:9040"
+                    ],
+                    "extra_config": {
+                        "backend/http": {
+                            "return_error_code": true
+                        }
+                    }
+                }
+            ]
+        },
+        {
+            "endpoint": "/api/v2/account",
+            "method": "GET",
+            "output_encoding": "json",
+            "backend": [
+                {
+                    "url_pattern": "/account/{JWT.sub}",
+                    "encoding": "json",
+                    "method": "GET",
+                    "host": [
+                        "http://account:9010"
+                    ],
+                    "disable_host_sanitize": false,
+                    "deny": [
+                        "password",
+                        "updated_at"
+                    ],
+                    "extra_config": {
+                        "backend/http": {
+                            "return_error_code": true
+                        }
+                    }
+                }
+            ],
+            "extra_config": {
+                "auth/validator": {
+                    "alg": "HS256",
+                    "audience": [
+                        "http://api.example.com"
+                    ],
+                    "roles_key": "roles",
+                    "issuer": "https://krakend.io",
+                    "roles": [
+                        "user"
+                    ],
+                    "jwk_local_path": "symmetric.json",
+                    "disable_jwk_security": true
+                },
+                "qos/ratelimit/router": {
+                    "max_rate": 50,
+                    "client_max_rate": 20,
+                    "strategy": "ip"
+                }
+            }
+        },
+        {
+            "endpoint": "/api/v2/account",
+            "method": "PATCH",
+            "output_encoding": "json",
+            "extra_config": {
+                "auth/validator": {
+                    "alg": "HS256",
+                    "audience": [
+                        "http://api.example.com"
+                    ],
+                    "roles_key": "roles",
+                    "issuer": "https://krakend.io",
+                    "roles": [
+                        "user"
+                    ],
+                    "jwk_local_path": "symmetric.json",
+                    "disable_jwk_security": true
+                },
+                "qos/ratelimit/router": {
+                    "max_rate": 50,
+                    "client_max_rate": 20,
+                    "strategy": "ip"
+                }
+            },
+            "backend": [
+                {
+                    "url_pattern": "/account/{JWT.sub}",
+                    "sd": "static",
+                    "method": "PATCH",
+                    "host": [
+                        "http://account:9010"
+                    ],
+                    "disable_host_sanitize": false
+                }
+            ]
+        },
+        {
+            "endpoint": "/api/v2/files/upload",
+            "method": "POST",
+            "output_encoding": "json",
+            "extra_config": {
+                "auth/validator": {
+                    "alg": "HS256",
+                    "audience": [
+                        "http://api.example.com"
+                    ],
+                    "roles_key": "roles",
+                    "issuer": "https://krakend.io",
+                    "roles": [
+                        "user"
+                    ],
+                    "jwk_local_path": "symmetric.json",
+                    "disable_jwk_security": true
+                },
+                "qos/ratelimit/router": {
+                    "max_rate": 50,
+                    "client_max_rate": 20,
+                    "strategy": "ip"
+                }
+            },
+            "backend": [
+                {
+                    "url_pattern": "/user/{JWT.sub}/save-file",
+                    "sd": "static",
+                    "method": "POST",
+                    "host": [
+                        "http://filemanager:9030"
+                    ],
+                    "disable_host_sanitize": false
+                }
+            ]
+        },
+        {
+            "endpoint": "/api/v2/file/{id}",
+            "method": "GET",
+            "output_encoding": "json",
+            "extra_config": {
+                "auth/validator": {
+                    "alg": "HS256",
+                    "audience": [
+                        "http://api.example.com"
+                    ],
+                    "roles_key": "roles",
+                    "issuer": "https://krakend.io",
+                    "roles": [
+                        "user"
+                    ],
+                    "jwk_local_path": "symmetric.json",
+                    "disable_jwk_security": true
+                },
+                "qos/ratelimit/router": {
+                    "max_rate": 50,
+                    "client_max_rate": 20,
+                    "strategy": "ip"
+                }
+            },
+            "backend": [
+                {
+                    "url_pattern": "/user/{JWT.sub}/file/{id}",
+                    "sd": "static",
+                    "method": "GET",
+                    "host": [
+                        "http://filemanager:9030"
+                    ],
+                    "disable_host_sanitize": false
+                }
+            ]
+        },
+        {
+            "endpoint": "/api/v2/files",
+            "method": "GET",
+            "output_encoding": "json",
+            "input_query_strings": [
+                "folder_id"
+            ],
+            "extra_config": {
+                "auth/validator": {
+                    "alg": "HS256",
+                    "audience": [
+                        "http://api.example.com"
+                    ],
+                    "roles_key": "roles",
+                    "issuer": "https://krakend.io",
+                    "roles": [
+                        "user"
+                    ],
+                    "jwk_local_path": "symmetric.json",
+                    "disable_jwk_security": true
+                },
+                "qos/ratelimit/router": {
+                    "max_rate": 50,
+                    "client_max_rate": 20,
+                    "strategy": "ip"
+                }
+            },
+            "backend": [
+                {
+                    "url_pattern": "/user/{JWT.sub}/files",
+                    "sd": "static",
+                    "method": "GET",
+                    "host": [
+                        "http://filemanager:9030"
+                    ],
+                    "disable_host_sanitize": false
+                }
+            ]
+        },
+        {
+            "endpoint": "/api/v2/file-data/{file_id}",
+            "method": "GET",
+            "output_encoding": "no-op",
+            "extra_config": {
+                "auth/validator": {
+                    "alg": "HS256",
+                    "audience": [
+                        "http://api.example.com"
+                    ],
+                    "roles_key": "roles",
+                    "issuer": "https://krakend.io",
+                    "roles": [
+                        "user"
+                    ],
+                    "jwk_local_path": "symmetric.json",
+                    "disable_jwk_security": true
+                },
+                "qos/ratelimit/router": {
+                    "max_rate": 50,
+                    "client_max_rate": 20,
+                    "strategy": "ip"
+                }
+            },
+            "backend": [
+                {
+                    "url_pattern": "/user/{JWT.sub}/file-data/{file_id}",
+                    "sd": "static",
+                    "method": "GET",
+                    "host": [
+                        "http://filemanager:9030"
+                    ],
+                    "disable_host_sanitize": false
+                }
+            ]
+        }
+    ]
+}
