@@ -81,3 +81,27 @@ services:
       - ./config/db/init/:/docker-entrypoint-initdb.d/
     networks:
       - intranet
+
+  auth:
+    build: ./auth
+    ports:
+      - "9040:9040"
+    restart: always
+    depends_on:
+      - kratos
+    environment:
+      - AUTH_SERVER=http://kratos:4433
+      - AUTH_SERVER_SESSION_NAME=ory_kratos_session
+      - PORT=9040
+    networks:
+      - intranet
+
+  krakend:
+    image: devopsfaith/krakend
+    volumes:
+      - ./config/krakend:/etc/krakend
+    ports:
+      - "8080:8080"
+    command: [ "run", "-d", "-c", "/etc/krakend/krakend.json" ]
+    networks:
+      - intranet
