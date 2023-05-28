@@ -1,21 +1,42 @@
 version: "3.7"
 
 services:
-  postgres-kratos:
-    image: postgres:9.6
+  postgres:
+    image: postgres:latest
     environment:
-      - POSTGRES_USER=kratos
-      - POSTGRES_PASSWORD=secret
-      - POSTGRES_DB=kratos
+      - POSTGRES_USER=user
+      - POSTGRES_PASSWORD=password
+      - POSTGRES_MULTIPLE_DATABASES=kratos,application
+    ports:
+      - 5432:5432
+    volumes:
+      - ./config/db/:/docker-entrypoint-initdb.d/
+    healthcheck:
+      test: /usr/bin/pg_isready
+      interval: 5s
+      timeout: 10s
+      retries: 120
+    networks:
+      - intranet
+
+  application-migrate:
+    build: ./application-migrate
+    environment:
+      DB_HOST: postgres
+      DB_PORT: 5432
+      DB_USER: user
+      PGPASSWORD: password
+      DB_NAME: application
+    depends_on:
+      postgres:
+        condition: service_healthy
     networks:
       - intranet
 
   kratos-migrate:
     image: oryd/kratos:v0.9.0-alpha.3
-    links:
-      - postgres-kratos:postgres-kratos
     environment:
-      - DSN=postgres://kratos:secret@postgres-kratos:5432/kratos?sslmode=disable&max_conns=20&max_idle_conns=4
+      - DSN=postgres://user:password@postgres:5432/kratos?sslmode=disable&max_conns=20&max_idle_conns=4
     networks:
       - intranet
     volumes:
@@ -26,10 +47,8 @@ services:
 
   kratos:
     image: oryd/kratos:v0.9.0-alpha.3
-    links:
-      - postgres-kratos:postgres-kratos
     environment:
-      - DSN=postgres://kratos:secret@postgres-kratos:5432/kratos?sslmode=disable&max_conns=20&max_idle_conns=4
+      - DSN=postgres://user:password@postgres:5432/kratos?sslmode=disable&max_conns=20&max_idle_conns=4
     ports:
       - "4433:4433"
       - "4434:4434"
@@ -76,9 +95,22 @@ services:
     volumes:
       - ./config/oathkeeper:/etc/config/oathkeeper
 
+  filemanager:
+    build: ./filemanager
+    ports:
+      - "9030:9030"
+    restart: always
+    depends_on:
+      - postgres
+      - rabbitmq
+    environment:
+      - RABBITMQ_URL=amqp://guest:guest@rabbitmq:5672/
+      - DATABASE_URL=host=postgres user=user password=password dbname=application port=5432 sslmode=disable
+      - STORAGE_SERVICE=http://storage:9020
+      - PORT=9030
+
   hello:
-    build:
-      context: "hello"
+    build: "./hello"
     networks:
       - intranet
 

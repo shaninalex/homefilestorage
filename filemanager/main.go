@@ -11,7 +11,6 @@ func main() {
 	err := app.Initialize(
 		os.Getenv("RABBITMQ_URL"),
 		os.Getenv("DATABASE_URL"),
-		os.Getenv("ACCOUNT_SERVICE"),
 		os.Getenv("STORAGE_SERVICE"),
 	)
 	if err != nil {
