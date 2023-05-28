@@ -20,7 +20,7 @@ type App struct {
 	ServiceStorage string
 }
 
-func (app *App) Initialize(rabbitmq_connection, database_path, account_service_url, storage_service_url string) error {
+func (app *App) Initialize(rabbitmq_connection, database_path, storage_service_url string) error {
 	db, err := sql.Open("postgres", database_path)
 	if err != nil {
 		return err
@@ -47,7 +47,6 @@ func (app *App) Initialize(rabbitmq_connection, database_path, account_service_u
 	app.MQConnection = mq_connection
 	app.MQChannel = ch
 	app.MQQueue = &q
-	app.ServiceAccount = account_service_url
 	app.ServiceStorage = storage_service_url
 
 	app.router = gin.Default()
@@ -61,10 +60,10 @@ func (app *App) initializeRoutes() {
 
 	actionsGroupUser := app.router.Group("/user")
 	{
-		actionsGroupUser.GET("/:user_id/files", app.GetFiles)
-		actionsGroupUser.GET("/:user_id/file/:id", app.SingleFile)
-		actionsGroupUser.POST("/:user_id/save-file", app.SaveFile)
-		actionsGroupUser.GET("/:user_id/file-data/:file_id", app.FileData)
+		actionsGroupUser.GET("/files", app.GetFiles)
+		actionsGroupUser.GET("/file/:id", app.SingleFile)
+		actionsGroupUser.POST("/save-file", app.SaveFile)
+		actionsGroupUser.GET("/file-data/:file_id", app.FileData)
 	}
 }
 
