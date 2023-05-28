@@ -50,7 +50,7 @@ func (app *App) SingleFile(c *gin.Context) {
 // If user hase right permissions and file exist function return
 // the file itseld
 func (app *App) GetFiles(c *gin.Context) {
-	user_id, _ := c.Params.Get("user_id")
+	user_id := c.Request.Header.Get("X-User")
 	folder_id, _ := strconv.Atoi(c.Query("folder_id"))
 	files, err := database.GetUserFiles(app.DB, user_id, int64(folder_id))
 	if err != nil {
@@ -67,7 +67,7 @@ func (app *App) GetFiles(c *gin.Context) {
 // Krakend will unpack user JWT token, get his sub and add into URL
 func (app *App) SaveFile(c *gin.Context) {
 	// check user existens ( this step require several steps - does it exists in database, active/inactive, Personal store GB limit)
-	user_id := c.Params.ByName("user_id")
+	user_id := c.Request.Header.Get("X-User")
 	respAccount, err := http.Get(fmt.Sprintf("%s/account/%s", app.ServiceAccount, user_id))
 	if err != nil {
 		log.Println(err)
@@ -141,7 +141,7 @@ func (app *App) SaveFile(c *gin.Context) {
 
 func (app *App) FileData(c *gin.Context) {
 	file_id, _ := c.Params.Get("file_id")
-	user_id, _ := c.Params.Get("user_id")
+	user_id := c.Request.Header.Get("X-User")
 	file_id_int, _ := strconv.Atoi(file_id)
 	user_id_int, _ := strconv.Atoi(user_id)
 

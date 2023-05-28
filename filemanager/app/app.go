@@ -58,12 +58,12 @@ func (app *App) initializeRoutes() {
 	// store := persistence.NewInMemoryStore(time.Minute)
 	app.router.GET("/_health", Health)
 
-	actionsGroupUser := app.router.Group("/user")
+	actionsGroupUser := app.router.Group("/files")
 	{
-		actionsGroupUser.GET("/files", app.GetFiles)
-		actionsGroupUser.GET("/file/:id", app.SingleFile)
-		actionsGroupUser.POST("/save-file", app.SaveFile)
-		actionsGroupUser.GET("/file-data/:file_id", app.FileData)
+		actionsGroupUser.GET("/list", app.GetFiles)
+		// actionsGroupUser.GET("/:id", app.SingleFile)
+		// actionsGroupUser.POST("/save", app.SaveFile)
+		// actionsGroupUser.GET("/data/:file_id", app.FileData)
 	}
 }
 
