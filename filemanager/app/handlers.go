@@ -27,29 +27,18 @@ func Health(c *gin.Context) {
 	})
 }
 
-// This api handler get
-// - user_id from JWT ( unpacked by krakend )
-// - file_id - the id of file he want to get
-// If user hase right permissions and file exist function return
-// the file itseld
-func (app *App) SingleFile(c *gin.Context) {
+func (app *App) GetSingleFile(c *gin.Context) {
 	file_id, _ := c.Params.Get("id")
-	user_id, _ := c.Params.Get("user_id")
+	user_id := c.Request.Header.Get("X-User")
 	file_id_int, _ := strconv.Atoi(file_id)
-	user_id_int, _ := strconv.Atoi(user_id)
-	file, err := database.GetFile(app.DB, int64(user_id_int), int64(file_id_int))
+	file, err := database.GetFile(app.DB, user_id, int64(file_id_int))
 	if err != nil {
 		c.JSON(http.StatusBadRequest, gin.H{"error": err})
 	}
 	c.JSON(http.StatusOK, gin.H{"file": file})
 }
 
-// This api handler get
-// - user_id from JWT ( unpacked by krakend )
-// - file_id - the id of file he want to get
-// If user hase right permissions and file exist function return
-// the file itseld
-func (app *App) GetFiles(c *gin.Context) {
+func (app *App) GetFilesList(c *gin.Context) {
 	user_id := c.Request.Header.Get("X-User")
 	folder_id, _ := strconv.Atoi(c.Query("folder_id"))
 	files, err := database.GetUserFiles(app.DB, user_id, int64(folder_id))
@@ -59,12 +48,6 @@ func (app *App) GetFiles(c *gin.Context) {
 	c.JSON(http.StatusOK, gin.H{"files": files})
 }
 
-// To save the file user should provide:
-// - user_id
-// - file it self
-// Optional:
-// Folder_id he want to save the file
-// Krakend will unpack user JWT token, get his sub and add into URL
 func (app *App) SaveFile(c *gin.Context) {
 	// check user existens ( this step require several steps - does it exists in database, active/inactive, Personal store GB limit)
 	user_id := c.Request.Header.Get("X-User")
@@ -81,7 +64,6 @@ func (app *App) SaveFile(c *gin.Context) {
 		return
 	}
 
-	// resend form data into storage service
 	req, err := http.NewRequest("POST", fmt.Sprintf("%s/save", app.ServiceStorage), c.Request.Body)
 	if err != nil {
 		log.Println(err)
@@ -143,9 +125,8 @@ func (app *App) FileData(c *gin.Context) {
 	file_id, _ := c.Params.Get("file_id")
 	user_id := c.Request.Header.Get("X-User")
 	file_id_int, _ := strconv.Atoi(file_id)
-	user_id_int, _ := strconv.Atoi(user_id)
 
-	file, err := database.GetFile(app.DB, int64(user_id_int), int64(file_id_int))
+	file, err := database.GetFile(app.DB, user_id, int64(file_id_int))
 	if err != nil {
 		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
 	}

@@ -21,8 +21,7 @@ CREATE TABLE IF NOT EXISTS "folders"
     "color" TEXT NOT NULL,
     "user_id" TEXT NOT NULL,
     "created_at" TIMESTAMP DEFAULT current_timestamp,
-    PRIMARY KEY (id),
-    FOREIGN KEY ("user_id") REFERENCES "users" ("id") ON DELETE CASCADE
+    PRIMARY KEY (id)
 );
 
 
