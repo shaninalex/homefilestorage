@@ -108,6 +108,8 @@ services:
       - DATABASE_URL=host=postgres user=user password=password dbname=application port=5432 sslmode=disable
       - STORAGE_SERVICE=http://storage:9020
       - PORT=9030
+    networks:
+      - intranet
 
   hello:
     build: "./hello"
@@ -119,6 +121,8 @@ services:
     ports:
       - 5672:5672
       - 15672:15672
+    networks:
+      - intranet
 
 networks:
   intranet:

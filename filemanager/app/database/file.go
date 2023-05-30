@@ -33,7 +33,7 @@ func (f *File) FileSave(db *sql.DB) error {
 	return nil
 }
 
-func GetFile(db *sql.DB, user_id int64, file_id int64) (*File, error) {
+func GetFile(db *sql.DB, user_id string, file_id int64) (*File, error) {
 	var file File
 	err := db.QueryRow(`SELECT * FROM files WHERE id = $1 AND user_id = $2`,
 		file_id, user_id).Scan(
@@ -53,6 +53,7 @@ func FileDelete(id string) (*File, error) {
 }
 
 func GetUserFiles(db *sql.DB, user_id string, folder_id int64) ([]File, error) {
+	log.Printf("Get files list for user %s\n", user_id)
 	rows, err := db.Query(`SELECT * FROM files WHERE user_id = $1 AND folder = $2`, user_id, folder_id)
 	if err != nil {
 		return nil, err

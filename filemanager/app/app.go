@@ -60,10 +60,10 @@ func (app *App) initializeRoutes() {
 
 	actionsGroupUser := app.router.Group("/files")
 	{
-		actionsGroupUser.GET("/list", app.GetFiles)
-		// actionsGroupUser.GET("/:id", app.SingleFile)
-		// actionsGroupUser.POST("/save", app.SaveFile)
-		// actionsGroupUser.GET("/data/:file_id", app.FileData)
+		actionsGroupUser.GET("/list", app.GetFilesList)
+		actionsGroupUser.GET("/:id", app.GetSingleFile)
+		actionsGroupUser.POST("/save", app.SaveFile)
+		actionsGroupUser.GET("/data/:file_id", app.FileData)
 	}
 }
 
