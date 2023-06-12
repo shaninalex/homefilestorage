@@ -1,0 +1,41 @@
+name: Push release on server
+
+on:
+  release:
+    types: [published]
+
+
+jobs:
+  
+  # build each custom service individualy
+  # and deploy binaries
+
+  restart:
+    name: Restart server
+    runs-on: ubuntu-22.04
+    # this is last job in the list and 
+    # require to successfull complete last jobs
+    # needs: []  
+    steps:
+      - name: Checkout
+        uses: actions/checkout@master
+
+      # - name: Install SSH Key
+      #   uses: shimataro/ssh-key-action@v2
+      #   with:
+      #     key: ${{ secrets.KEY }}
+      #     known_hosts: unnecessary
+
+      # - name: Adding Known Hosts
+      #   run: ssh-keyscan -H ${{ secrets.HOST }}  >> ~/.ssh/known_hosts
+
+      # - name: Upload restart script
+      #   run: rsync -avz ./restart.sh ${{ secrets.USERNAME }}@${{ secrets.HOST }}:/home/user/
+
+      # - name: Restarting server
+      #   uses: appleboy/ssh-action@v0.1.10
+      #   with:
+      #     host: ${{ secrets.HOST }}
+      #     username: ${{ secrets.USERNAME }}
+      #     key: ${{ secrets.KEY }}
+      #     script: /home/user/restart.sh
