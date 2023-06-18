@@ -36,6 +36,7 @@ func (app *App) Initialize(kratos_path string) error {
 
 func (app *App) initializeRoutes() {
 	app.router.GET("/user/info", app.GetUserInfoBySession)
+	app.router.GET("/user/check", app.CheckUserSession)
 }
 
 func (app *App) Run(port string) {
@@ -77,4 +78,21 @@ func (app *App) GetUserInfoBySession(c *gin.Context) {
 
 	c.JSON(http.StatusOK, session.Identity.Traits)
 
+}
+
+func (app *App) CheckUserSession(c *gin.Context) {
+
+	session, err := app.validateSession(c.Request)
+	if err != nil {
+		log.Println(err)
+		c.JSON(http.StatusUnauthorized, gin.H{"error": "Unauthorized"})
+		return
+	}
+	if !*session.Active {
+		log.Println(err)
+		c.JSON(http.StatusUnauthorized, gin.H{"error": "Session not active"})
+		return
+	}
+
+	c.JSON(http.StatusOK, nil)
 }
