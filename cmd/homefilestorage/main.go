@@ -1,7 +1,15 @@
 package main
 
-import "log"
+import (
+	"log"
+
+	"github.com/shaninalex/homefilestorage/api"
+)
 
 func main() {
-	log.Println("Start application")
+	app, err := api.CreateApplication()
+	if err != nil {
+		log.Println(err)
+	}
+	app.Run(8000)
 }
