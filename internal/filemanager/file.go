@@ -1,4 +1,4 @@
-package database
+package filemanager
 
 import (
 	"database/sql"

@@ -1,4 +1,4 @@
-package app
+package filemanager
 
 import (
 	"encoding/json"
@@ -10,7 +10,6 @@ import (
 	"strconv"
 
 	"github.com/gin-gonic/gin"
-	"github.com/shaninalex/homefilestorage/filemanger/app/database"
 )
 
 type FileResponse struct {
@@ -21,27 +20,18 @@ type FileResponse struct {
 	Hash       string `json:"hash"`
 }
 
-func Health(c *gin.Context) {
-	c.JSON(http.StatusOK, gin.H{
-		"status": "ok",
-	})
-}
-
-func (app *App) GetSingleFile(c *gin.Context) {
-	file_id, _ := c.Params.Get("id")
-	user_id := c.Request.Header.Get("X-User")
-	file_id_int, _ := strconv.Atoi(file_id)
-	file, err := database.GetFile(app.DB, user_id, int64(file_id_int))
+func (app *App) GetSingleFile(file_id int, user_id string) (*File, error) {
+	file, err := GetFile(app.DB, user_id, int64(file_id))
 	if err != nil {
-		c.JSON(http.StatusBadRequest, gin.H{"error": err})
+		return nil, err
 	}
-	c.JSON(http.StatusOK, gin.H{"file": file})
+	return file, nil
 }
 
 func (app *App) GetFilesList(c *gin.Context) {
 	user_id := c.Request.Header.Get("X-User")
 	folder_id, _ := strconv.Atoi(c.Query("folder_id"))
-	files, err := database.GetUserFiles(app.DB, user_id, int64(folder_id))
+	files, err := GetUserFiles(app.DB, user_id, int64(folder_id))
 	if err != nil {
 		c.JSON(http.StatusBadRequest, gin.H{"error": err})
 	}
@@ -115,8 +105,6 @@ func (app *App) SaveFile(c *gin.Context) {
 		c.JSON(http.StatusBadRequest, gin.H{"error": err})
 		return
 	}
-
-	Publish(app.MQQueue.Name, fmt.Sprintf("New file saved from user: %s", user_id), app.MQChannel, app.MQQueue)
 
 	c.JSON(http.StatusOK, gin.H{"file": file})
 }
