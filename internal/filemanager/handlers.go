@@ -10,6 +10,7 @@ import (
 	"strconv"
 
 	"github.com/gin-gonic/gin"
+	"github.com/shaninalex/homefilestorage/internal/filemanager"
 )
 
 type FileResponse struct {
@@ -41,7 +42,7 @@ func (app *App) GetFilesList(c *gin.Context) {
 func (app *App) SaveFile(c *gin.Context) {
 	// check user existens ( this step require several steps - does it exists in database, active/inactive, Personal store GB limit)
 	user_id := c.Request.Header.Get("X-User")
-	respAccount, err := http.Get(fmt.Sprintf("%s/account/%s", app.ServiceAccount, user_id))
+	respAccount, err := http.Get(fmt.Sprintf("%s/account/%s", filemanager.ServiceAccount, user_id))
 	if err != nil {
 		log.Println(err)
 		c.JSON(http.StatusBadRequest, gin.H{"error": err})
