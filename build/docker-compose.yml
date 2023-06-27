@@ -102,36 +102,17 @@ services:
     volumes:
       - ./config/oathkeeper:/etc/config/oathkeeper
 
-  # validate user Cookie and get User tratis (email, name{first,last})
-  user:
-    build: ./user
-    networks:
-      - intranet
-    environment:
-      - PORT=9040
-      - KRATOS_PATH=http://kratos:4433
-
   filemanager:
     build: ./filemanager
     ports:
-      - "9030:9030"
+      - "9000:9000"
     restart: always
     depends_on:
       - postgres
       - rabbitmq
     environment:
-      - RABBITMQ_URL=amqp://guest:guest@rabbitmq:5672/
       - DATABASE_URL=host=postgres user=user password=password dbname=application port=5432 sslmode=disable
-      - STORAGE_SERVICE=http://storage:9020
-      - PORT=9030
-    networks:
-      - intranet
-
-  rabbitmq:
-    image: rabbitmq:3-management-alpine
-    ports:
-      - 5672:5672
-      - 15672:15672
+      - PORT=9000
     networks:
       - intranet
 

@@ -6,27 +6,33 @@ import (
 
 	"github.com/gin-gonic/gin"
 	_ "github.com/lib/pq"
+	"github.com/shaninalex/homefilestorage/internal/filemanager"
 )
 
-type App struct {
-	router *gin.Engine
+type Api struct {
+	router      *gin.Engine
+	filemanager *filemanager.FileManager
 }
 
-func CreateApplication() (*App, error) {
-	var app App
+func CreateApplication(filemanager *filemanager.FileManager) (*Api, error) {
+	var api Api
 
-	app.router = gin.Default()
-	return &app, nil
+	api.filemanager = filemanager
+	api.router = gin.Default()
+	return &api, nil
 }
 
-func (app *App) initializeRoutes() {
-	app.router.GET("/health", app.AppHealth)
+func (api *Api) initializeRoutes() {
+	api.router.GET("/health", api.AppHealth)
+
+	// TODO: Get files list
+	// TODO: Upload File
 }
 
-func (app *App) Run(port int) {
-	app.router.Run(fmt.Sprintf(":%d", port))
+func (api *Api) Run(port int) {
+	api.router.Run(fmt.Sprintf(":%d", port))
 }
 
-func (app *App) AppHealth(c *gin.Context) {
+func (api *Api) AppHealth(c *gin.Context) {
 	c.JSON(http.StatusOK, gin.H{"status": true})
 }

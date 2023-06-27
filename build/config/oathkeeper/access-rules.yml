@@ -1,33 +1,13 @@
 - id: "filemanager"
   upstream:
     preserve_host: true
-    url: "http://filemanager:9030"
+    url: "http://filemanager:9000"
     strip_path: /api/v2
   match:
     url: "http://127.0.0.1:8080/api/v2/files/<**>"
     methods:
       - GET
       - POST
-  authenticators:
-    - handler: cookie_session
-  mutators:
-    - handler: header
-  authorizer:
-    handler: allow
-  errors:
-    - handler: redirect
-      config:
-        to: http://127.0.0.1:4455/login
-
-- id: "user"
-  upstream:
-    preserve_host: true
-    url: "http://user:9040"
-    strip_path: /api/v2
-  match:
-    url: "http://127.0.0.1:8080/api/v2/user/<**>"
-    methods:
-      - GET
   authenticators:
     - handler: cookie_session
   mutators:
