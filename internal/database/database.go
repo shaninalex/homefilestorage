@@ -1,10 +1,24 @@
-package filemanager
+package database
 
 import (
 	"database/sql"
 	"log"
 	"time"
 )
+
+type Database struct {
+	db *sql.DB
+}
+
+func CreateConnection(connection_string string) (*Database, error) {
+	var database Database
+	db, err := sql.Open("postgres", connection_string)
+	if err != nil {
+		return nil, err
+	}
+	database.db = db
+	return &database, nil
+}
 
 type File struct {
 	ID         uint      `json:"id,omitempty"`
@@ -19,8 +33,8 @@ type File struct {
 	Created_at time.Time `json:"created_at,omitempty"`
 }
 
-func (f *File) FileSave(db *sql.DB) error {
-	err := db.QueryRow(`
+func (db *Database) FileSave(f *File) error {
+	err := db.db.QueryRow(`
 		INSERT INTO files (name, mime_type, size, system_path, user_id, hash, public, folder) 
 		VALUES ( $1, $2, $3, $4, $5, $6, $7, $8 ) RETURNING id, created_at`,
 		f.Name, f.MimeType, f.Size, f.SystemPath, f.Owner, f.Hash, f.Public, f.FolderId,
@@ -33,9 +47,9 @@ func (f *File) FileSave(db *sql.DB) error {
 	return nil
 }
 
-func GetFile(db *sql.DB, user_id string, file_id int64) (*File, error) {
+func (db *Database) GetFile(user_id string, file_id int64) (*File, error) {
 	var file File
-	err := db.QueryRow(`SELECT * FROM files WHERE id = $1 AND user_id = $2`,
+	err := db.db.QueryRow(`SELECT * FROM files WHERE id = $1 AND user_id = $2`,
 		file_id, user_id).Scan(
 		&file.ID, &file.Name, &file.MimeType, &file.Size, &file.SystemPath,
 		&file.Owner, &file.Hash, &file.Public, &file.FolderId, &file.Created_at,
@@ -46,15 +60,15 @@ func GetFile(db *sql.DB, user_id string, file_id int64) (*File, error) {
 	return &file, nil
 }
 
-func FileDelete(id string) (*File, error) {
+func (db *Database) FileDelete(id string) (*File, error) {
 	// delete from database
 	// rabbitmq request to storage to delete file
 	return nil, nil
 }
 
-func GetUserFiles(db *sql.DB, user_id string, folder_id int64) ([]File, error) {
+func (db *Database) GetUserFiles(user_id string, folder_id int64) ([]File, error) {
 	log.Printf("Get files list for user %s\n", user_id)
-	rows, err := db.Query(`SELECT * FROM files WHERE user_id = $1 AND folder = $2`, user_id, folder_id)
+	rows, err := db.db.Query(`SELECT * FROM files WHERE user_id = $1 AND folder = $2`, user_id, folder_id)
 	if err != nil {
 		return nil, err
 	}
