@@ -5,7 +5,6 @@ import (
 	"log"
 	"mime"
 	"net/http"
-	"os"
 	"strconv"
 
 	"github.com/gin-gonic/gin"
@@ -31,15 +30,12 @@ func (api *Api) FilesUpload(c *gin.Context) {
 	if err != nil {
 		c.JSON(http.StatusBadRequest, gin.H{"error": "error reading input data"})
 	}
-	// move things below to filemanager package
 	fileinfo, err := api.filemanager.SaveFile(filename, d)
-	tmpfile, err := os.Create("./" + filename)
-	defer tmpfile.Close()
+	// TODO: Save fileinfo to user
 	if err != nil {
-		c.JSON(http.StatusBadRequest, gin.H{"error": "error writing file"})
+		c.JSON(http.StatusBadRequest, gin.H{"error": "error reading input data"})
 	}
-	tmpfile.Write(d)
-	c.JSON(http.StatusOK, gin.H{"success": "file saved"})
+	c.JSON(http.StatusOK, fileinfo)
 }
 
 func handleMediaType(header_media_type string) string {
