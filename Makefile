@@ -1,7 +1,7 @@
 start:
-	docker compose -f docker-compose.yml up -d --build
+	docker compose -f ./build/docker-compose.yml up -d --build
 
 down:
-	docker compose -f docker-compose.yml down -v
+	docker compose -f ./build/docker-compose.yml down -v
 
 restart: down start
