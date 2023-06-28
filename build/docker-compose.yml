@@ -103,15 +103,15 @@ services:
       - ./config/oathkeeper:/etc/config/oathkeeper
 
   filemanager:
-    build: ./filemanager
+    build: ../
     ports:
       - "9000:9000"
     restart: always
     depends_on:
       - postgres
-      - rabbitmq
     environment:
-      - DATABASE_URL=host=postgres user=user password=password dbname=application port=5432 sslmode=disable
+      - FILEMANAGER_PATH="./uploads/"
+      - DATABASE_CONNECTION="host=postgres user=user password=password dbname=application port=5432 sslmode=disable"
       - PORT=9000
     networks:
       - intranet

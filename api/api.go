@@ -15,15 +15,15 @@ type Api struct {
 	database    *database.Database
 }
 
-func CreateApplication(
-	filemanager *filemanager.FileManager,
-	database *database.Database,
-) (*Api, error) {
+func CreateApi(filemanager *filemanager.FileManager, database *database.Database) (*Api, error) {
 	var api Api
 
 	api.database = database
 	api.filemanager = filemanager
 	api.router = gin.Default()
+
+	api.initializeRoutes()
+
 	return &api, nil
 }
 
