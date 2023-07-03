@@ -19,6 +19,7 @@ func (api *Api) FilesList(c *gin.Context) {
 	folder_id, _ := strconv.Atoi(c.Query("folder_id"))
 	files, err := api.database.GetUserFiles(user_id, int64(folder_id))
 	if err != nil {
+		log.Println(err)
 		c.JSON(http.StatusBadRequest, gin.H{"error": err})
 	}
 	c.JSON(http.StatusOK, gin.H{"files": files})

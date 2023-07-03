@@ -7,16 +7,18 @@ import (
 )
 
 type Database struct {
-	db *sql.DB
+	DB *sql.DB
 }
 
 func CreateConnection(connection_string string) (*Database, error) {
+	log.Println("Attempt to create connection")
 	var database Database
 	db, err := sql.Open("postgres", connection_string)
 	if err != nil {
 		return nil, err
 	}
-	database.db = db
+	log.Println("Database connection established")
+	database.DB = db
 	return &database, nil
 }
 
@@ -34,7 +36,7 @@ type File struct {
 }
 
 func (db *Database) FileSave(f *File) error {
-	err := db.db.QueryRow(`
+	err := db.DB.QueryRow(`
 		INSERT INTO files (name, mime_type, size, system_path, user_id, hash, public, folder) 
 		VALUES ( $1, $2, $3, $4, $5, $6, $7, $8 ) RETURNING id, created_at`,
 		f.Name, f.MimeType, f.Size, f.SystemPath, f.Owner, f.Hash, f.Public, f.FolderId,
@@ -49,7 +51,7 @@ func (db *Database) FileSave(f *File) error {
 
 func (db *Database) GetFile(user_id string, file_id int64) (*File, error) {
 	var file File
-	err := db.db.QueryRow(`SELECT * FROM files WHERE id = $1 AND user_id = $2`,
+	err := db.DB.QueryRow(`SELECT * FROM files WHERE id = $1 AND user_id = $2`,
 		file_id, user_id).Scan(
 		&file.ID, &file.Name, &file.MimeType, &file.Size, &file.SystemPath,
 		&file.Owner, &file.Hash, &file.Public, &file.FolderId, &file.Created_at,
@@ -68,7 +70,7 @@ func (db *Database) FileDelete(id string) (*File, error) {
 
 func (db *Database) GetUserFiles(user_id string, folder_id int64) ([]File, error) {
 	log.Printf("Get files list for user %s\n", user_id)
-	rows, err := db.db.Query(`SELECT * FROM files WHERE user_id = $1 AND folder = $2`, user_id, folder_id)
+	rows, err := db.DB.Query(`SELECT * FROM files WHERE user_id = $1 AND folder = $2`, user_id, folder_id)
 	if err != nil {
 		return nil, err
 	}
