@@ -28,7 +28,7 @@ type File struct {
 	MimeType   string    `json:"mime_type"`
 	Size       uint      `json:"size"`
 	SystemPath string    `json:"system_path"`
-	Owner      uint      `json:"owner"`
+	Owner      string    `json:"owner"`
 	Hash       string    `json:"hash"`
 	Public     bool      `json:"public"`
 	FolderId   uint      `json:"folder_id"`
