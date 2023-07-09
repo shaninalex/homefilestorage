@@ -1,6 +1,25 @@
 version: "3.7"
 
 services:
+
+  filemanager:
+    build: ../
+    container_name: filemanager
+    ports:
+      - "9000:9000"
+    restart: always
+    depends_on:
+      - postgres
+    environment:
+      - FILEMANAGER_PATH=/uploads
+      - DATABASE_CONNECTION=host=postgres user=user password=password dbname=application port=5432 sslmode=disable
+      - KRATOS_PATH=http://kratos:4433
+      - PORT=9000
+    volumes:
+      - ./volumes/uploads:/uploads
+    networks:
+      - intranet
+
   postgres:
     image: postgres:latest
     environment:
@@ -101,21 +120,6 @@ services:
       - intranet
     volumes:
       - ./config/oathkeeper:/etc/config/oathkeeper
-
-  filemanager:
-    build: ../
-    ports:
-      - "9000:9000"
-    restart: always
-    depends_on:
-      - postgres
-    environment:
-      - FILEMANAGER_PATH=./uploads/
-      - DATABASE_CONNECTION=host=postgres user=user password=password dbname=application port=5432 sslmode=disable
-      - KRATOS_PATH=http://kratos:4433
-      - PORT=9000
-    networks:
-      - intranet
 
 networks:
   intranet:

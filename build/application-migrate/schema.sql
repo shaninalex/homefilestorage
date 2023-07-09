@@ -12,6 +12,9 @@ CREATE TABLE IF NOT EXISTS "files"
     "created_at" TIMESTAMP DEFAULT current_timestamp,
     PRIMARY KEY (id),
     CHECK ("size" > 0)
+    -- TODO: check user_id length
+    -- TODO: check system_path length
+    -- TODO: check name length
 );
 
 CREATE TABLE IF NOT EXISTS "folders"

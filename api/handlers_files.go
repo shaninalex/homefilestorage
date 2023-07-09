@@ -8,6 +8,8 @@ import (
 	"strconv"
 
 	"github.com/gin-gonic/gin"
+	db "github.com/shaninalex/homefilestorage/internal/database"
+	fm "github.com/shaninalex/homefilestorage/internal/filemanager"
 )
 
 func (api *Api) AppHealth(c *gin.Context) {
@@ -26,15 +28,36 @@ func (api *Api) FilesList(c *gin.Context) {
 }
 
 func (api *Api) FilesUpload(c *gin.Context) {
+	user_id := c.Request.Header.Get("X-User")
+
 	d, err := ioutil.ReadAll(c.Request.Body)
 	filename := handleMediaType(c.Request.Header.Get("Content-Disposition"))
 	if err != nil {
 		c.JSON(http.StatusBadRequest, gin.H{"error": "error reading input data"})
+		return
 	}
 	fileinfo, err := api.filemanager.SaveFile(filename, d)
-	// TODO: Save fileinfo to user
+	go func(f *fm.FileResponse) {
+		file := &db.File{
+			Name:       f.Name,
+			MimeType:   f.MimeType,
+			Size:       uint(f.Size),
+			SystemPath: f.SystemPath,
+			Hash:       f.Hash,
+			Owner:      user_id,
+			FolderId:   0,
+			Public:     false,
+		}
+		err := api.database.FileSave(file)
+		if err != nil {
+			log.Println(err)
+		}
+	}(fileinfo)
+
 	if err != nil {
+		log.Println(err)
 		c.JSON(http.StatusBadRequest, gin.H{"error": "error reading input data"})
+		return
 	}
 	c.JSON(http.StatusOK, fileinfo)
 }
