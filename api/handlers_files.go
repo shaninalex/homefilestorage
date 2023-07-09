@@ -1,7 +1,7 @@
 package api
 
 import (
-	"io/ioutil"
+	"io"
 	"log"
 	"mime"
 	"net/http"
@@ -30,7 +30,7 @@ func (api *Api) FilesList(c *gin.Context) {
 func (api *Api) FilesUpload(c *gin.Context) {
 	user_id := c.Request.Header.Get("X-User")
 
-	d, err := ioutil.ReadAll(c.Request.Body)
+	d, err := io.ReadAll(c.Request.Body)
 	filename := handleMediaType(c.Request.Header.Get("Content-Disposition"))
 	if err != nil {
 		c.JSON(http.StatusBadRequest, gin.H{"error": "error reading input data"})
