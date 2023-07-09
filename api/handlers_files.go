@@ -9,7 +9,6 @@ import (
 
 	"github.com/gin-gonic/gin"
 	db "github.com/shaninalex/homefilestorage/internal/database"
-	fm "github.com/shaninalex/homefilestorage/internal/filemanager"
 )
 
 func (api *Api) AppHealth(c *gin.Context) {
@@ -36,30 +35,38 @@ func (api *Api) FilesUpload(c *gin.Context) {
 		c.JSON(http.StatusBadRequest, gin.H{"error": "error reading input data"})
 		return
 	}
-	fileinfo, err := api.filemanager.SaveFile(filename, d)
-	go func(f *fm.FileResponse) {
-		file := &db.File{
-			Name:       f.Name,
-			MimeType:   f.MimeType,
-			Size:       uint(f.Size),
-			SystemPath: f.SystemPath,
-			Hash:       f.Hash,
-			Owner:      user_id,
-			FolderId:   0,
-			Public:     false,
-		}
-		err := api.database.FileSave(file)
-		if err != nil {
-			log.Println(err)
-		}
-	}(fileinfo)
+	f, err := api.filemanager.SaveFile(filename, d)
+	if err != nil {
+		log.Println(err)
+		c.JSON(http.StatusBadRequest, gin.H{"error": "cant save file"})
+		return
+	}
+
+	file := &db.File{
+		Name:       f.Name,
+		MimeType:   f.MimeType,
+		Size:       uint(f.Size),
+		SystemPath: f.SystemPath,
+		Hash:       f.Hash,
+		Owner:      user_id,
+		FolderId:   0,
+		Public:     false,
+	}
+	err = api.database.FileSave(file)
+	if err != nil {
+		log.Println(err)
+		c.JSON(http.StatusBadRequest, gin.H{"error": "cant save file to db"})
+		return
+	}
 
 	if err != nil {
 		log.Println(err)
 		c.JSON(http.StatusBadRequest, gin.H{"error": "error reading input data"})
 		return
 	}
-	c.JSON(http.StatusOK, fileinfo)
+
+	// TODO: write metrics and logs
+	c.JSON(http.StatusOK, &file)
 }
 
 func handleMediaType(header_media_type string) string {

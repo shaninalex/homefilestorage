@@ -45,7 +45,6 @@ func (db *Database) FileSave(f *File) error {
 		log.Println(err)
 		return err
 	}
-
 	return nil
 }
 
