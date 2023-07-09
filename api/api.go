@@ -41,12 +41,20 @@ func CreateApi(filemanager *filemanager.FileManager, database *database.Database
 func (api *Api) initializeRoutes() {
 	api.router.GET("/health", api.AppHealth)
 
-	api.router.GET("/files/list", api.FilesList)
-	api.router.POST("/files/upload", api.FilesUpload)
+	files := api.router.Group("/files")
+	files.Use(SetUserID())
+	{
+		files.GET("/:file_id", api.FilesItem)
+		files.GET("/list", api.FilesList)
+		files.POST("/upload", api.FilesUpload)
+	}
 
-	api.router.GET("/user/info", api.GetUserInfoBySession)
-	api.router.GET("/user/check", api.CheckUserSession)
-
+	user := api.router.Group("/user")
+	user.Use(SetUserID())
+	{
+		user.GET("/info", api.GetUserInfoBySession)
+		user.GET("/check", api.CheckUserSession)
+	}
 }
 
 func (api *Api) Run(port int) {

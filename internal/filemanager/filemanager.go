@@ -3,7 +3,6 @@ package filemanager
 import (
 	"crypto/sha1"
 	"encoding/hex"
-	"errors"
 	"fmt"
 	"io"
 	"io/ioutil"
@@ -14,18 +13,11 @@ import (
 
 	"github.com/google/uuid"
 	"github.com/h2non/filetype"
+	"github.com/shaninalex/homefilestorage/internal/typedefs"
 )
 
 type FileManager struct {
 	ServiceStorage string
-}
-
-type FileResponse struct {
-	Name       string `json:"name"`
-	MimeType   string `json:"mime_type"`
-	Size       uint64 `json:"size"`
-	SystemPath string `json:"system_path"`
-	Hash       string `json:"hash"`
 }
 
 func Initialize(storage_service_url string) *FileManager {
@@ -34,7 +26,7 @@ func Initialize(storage_service_url string) *FileManager {
 	return fm
 }
 
-func (filemanager *FileManager) SaveFile(filename string, d []byte) (*FileResponse, error) {
+func (filemanager *FileManager) SaveFile(filename string, d []byte) (*typedefs.File, error) {
 
 	// Create path
 	u := uuid.New()
@@ -70,13 +62,15 @@ func (filemanager *FileManager) SaveFile(filename string, d []byte) (*FileRespon
 		return nil, err
 	}
 
-	var response FileResponse
-	response.Hash = hash
-	response.MimeType = mime
-	response.SystemPath = uploads_path
-	response.Name = filename
-	response.Size = uint64(file_size)
-	return &response, nil
+	response := &typedefs.File{
+		Hash:       hash,
+		MimeType:   mime,
+		SystemPath: uploads_path,
+		Name:       filename,
+		Size:       uint(file_size),
+	}
+
+	return response, nil
 }
 
 func getMIME(save_path string) (string, error) {
@@ -92,10 +86,11 @@ func getMIME(save_path string) (string, error) {
 		return "", err
 	}
 
-	if filetype.IsImage(buf) && filetype.IsDocument(buf) && filetype.IsAudio(buf) && filetype.IsArchive(buf) && filetype.IsVideo(buf) {
-		os.Remove(save_path)
-		return "", errors.New("unknow file type")
-	}
+	// TODO: Handle unknow file type error ( if it will be error )
+	// if filetype.IsImage(buf) && filetype.IsDocument(buf) && filetype.IsAudio(buf) && filetype.IsArchive(buf) && filetype.IsVideo(buf) {
+	// 	os.Remove(save_path)
+	// 	return "", errors.New("unknow file type")
+	// }
 	return kind.MIME.Value, nil
 }
 

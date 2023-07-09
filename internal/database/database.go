@@ -4,6 +4,8 @@ import (
 	"database/sql"
 	"log"
 	"time"
+
+	"github.com/shaninalex/homefilestorage/internal/typedefs"
 )
 
 type Database struct {
@@ -22,20 +24,7 @@ func CreateConnection(connection_string string) (*Database, error) {
 	return &database, nil
 }
 
-type File struct {
-	ID         uint      `json:"id,omitempty"`
-	Name       string    `json:"name"`
-	MimeType   string    `json:"mime_type"`
-	Size       uint      `json:"size"`
-	SystemPath string    `json:"system_path"`
-	Owner      string    `json:"owner"`
-	Hash       string    `json:"hash"`
-	Public     bool      `json:"public"`
-	FolderId   uint      `json:"folder_id"`
-	Created_at time.Time `json:"created_at,omitempty"`
-}
-
-func (db *Database) FileSave(f *File) error {
+func (db *Database) FileSave(f *typedefs.File) error {
 	err := db.DB.QueryRow(`
 		INSERT INTO files (name, mime_type, size, system_path, user_id, hash, public, folder) 
 		VALUES ( $1, $2, $3, $4, $5, $6, $7, $8 ) RETURNING id, created_at`,
@@ -48,8 +37,8 @@ func (db *Database) FileSave(f *File) error {
 	return nil
 }
 
-func (db *Database) GetFile(user_id string, file_id int64) (*File, error) {
-	var file File
+func (db *Database) GetFile(user_id string, file_id int64) (*typedefs.File, error) {
+	var file typedefs.File
 	err := db.DB.QueryRow(`SELECT * FROM files WHERE id = $1 AND user_id = $2`,
 		file_id, user_id).Scan(
 		&file.ID, &file.Name, &file.MimeType, &file.Size, &file.SystemPath,
@@ -61,23 +50,22 @@ func (db *Database) GetFile(user_id string, file_id int64) (*File, error) {
 	return &file, nil
 }
 
-func (db *Database) FileDelete(id string) (*File, error) {
+func (db *Database) FileDelete(id string) (*typedefs.File, error) {
 	// delete from database
 	// rabbitmq request to storage to delete file
 	return nil, nil
 }
 
-func (db *Database) GetUserFiles(user_id string, folder_id int64) ([]File, error) {
-	log.Printf("Get files list for user %s\n", user_id)
+func (db *Database) GetUserFiles(user_id string, folder_id int64) ([]typedefs.File, error) {
 	rows, err := db.DB.Query(`SELECT * FROM files WHERE user_id = $1 AND folder = $2`, user_id, folder_id)
 	if err != nil {
 		return nil, err
 	}
 	defer rows.Close()
 
-	var files []File
+	var files []typedefs.File
 	for rows.Next() {
-		var file File
+		var file typedefs.File
 		if err := rows.Scan(
 			&file.ID, &file.Name, &file.MimeType, &file.Size, &file.SystemPath,
 			&file.Owner, &file.Hash, &file.Public, &file.FolderId, &file.Created_at,

@@ -8,7 +8,7 @@ import (
 	"strconv"
 
 	"github.com/gin-gonic/gin"
-	db "github.com/shaninalex/homefilestorage/internal/database"
+	"github.com/shaninalex/homefilestorage/internal/typedefs"
 )
 
 func (api *Api) AppHealth(c *gin.Context) {
@@ -16,7 +16,7 @@ func (api *Api) AppHealth(c *gin.Context) {
 }
 
 func (api *Api) FilesList(c *gin.Context) {
-	user_id := c.Request.Header.Get("X-User")
+	user_id := c.MustGet("user_id").(string)
 	folder_id, _ := strconv.Atoi(c.Query("folder_id"))
 	files, err := api.database.GetUserFiles(user_id, int64(folder_id))
 	if err != nil {
@@ -27,7 +27,7 @@ func (api *Api) FilesList(c *gin.Context) {
 }
 
 func (api *Api) FilesUpload(c *gin.Context) {
-	user_id := c.Request.Header.Get("X-User")
+	user_id := c.MustGet("user_id").(string)
 
 	d, err := io.ReadAll(c.Request.Body)
 	filename := handleMediaType(c.Request.Header.Get("Content-Disposition"))
@@ -42,7 +42,7 @@ func (api *Api) FilesUpload(c *gin.Context) {
 		return
 	}
 
-	file := &db.File{
+	file := &typedefs.File{
 		Name:       f.Name,
 		MimeType:   f.MimeType,
 		Size:       uint(f.Size),
@@ -67,6 +67,31 @@ func (api *Api) FilesUpload(c *gin.Context) {
 
 	// TODO: write metrics and logs
 	c.JSON(http.StatusOK, &file)
+}
+
+func (api *Api) FilesItem(c *gin.Context) {
+	user_id := c.MustGet("user_id").(string)
+	file_id, exists := c.Params.Get("file_id")
+	if !exists {
+		log.Println(exists)
+		c.JSON(http.StatusNotFound, gin.H{"error": "Not found"})
+		return
+	}
+
+	_file_id, err := strconv.Atoi(file_id)
+	if err != nil {
+		log.Println(err)
+		c.JSON(http.StatusBadRequest, gin.H{"error": "Invalid file id"})
+		return
+	}
+	file, err := api.database.GetFile(user_id, int64(_file_id))
+	if err != nil {
+		log.Println(err)
+		c.JSON(http.StatusBadRequest, gin.H{"error": "Invalid file id"})
+		return
+	}
+	log.Println(file.SystemPath)
+	c.File(file.SystemPath)
 }
 
 func handleMediaType(header_media_type string) string {
