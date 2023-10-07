@@ -4,8 +4,6 @@ import (
 	"fmt"
 
 	"github.com/gin-gonic/gin"
-	_ "github.com/lib/pq"
-	ory "github.com/ory/kratos-client-go"
 	"github.com/shaninalex/homefilestorage/internal/database"
 	"github.com/shaninalex/homefilestorage/internal/filemanager"
 )
@@ -14,25 +12,15 @@ type Api struct {
 	router      *gin.Engine
 	filemanager *filemanager.FileManager
 	database    *database.Database
-	ory         *ory.APIClient
-	kratos_path string
 }
 
-func CreateApi(filemanager *filemanager.FileManager, database *database.Database, kratos_path string) (*Api, error) {
+func CreateApi(filemanager *filemanager.FileManager, database *database.Database) (*Api, error) {
 	var api Api
 
 	api.database = database
 	api.filemanager = filemanager
 	api.router = gin.Default()
-	api.kratos_path = kratos_path
 
-	configuration := ory.NewConfiguration()
-	configuration.Servers = []ory.ServerConfiguration{
-		{
-			URL: "http://kratos:4433",
-		},
-	}
-	api.ory = ory.NewAPIClient(configuration)
 	api.initializeRoutes()
 
 	return &api, nil

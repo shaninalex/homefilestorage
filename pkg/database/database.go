@@ -5,21 +5,19 @@ import (
 	"log"
 	"time"
 
-	"github.com/shaninalex/homefilestorage/internal/typedefs"
+	"github.com/shaninalex/homefilestorage/pkg/typedefs"
 )
 
 type Database struct {
 	DB *sql.DB
 }
 
-func CreateConnection(connection_string string) (*Database, error) {
-	log.Println("Attempt to create connection")
+func CreateConnection(db_path string) (*Database, error) {
 	var database Database
-	db, err := sql.Open("postgres", connection_string)
+	db, err := sql.Open("sqlite3", db_path)
 	if err != nil {
 		return nil, err
 	}
-	log.Println("Database connection established")
 	database.DB = db
 	return &database, nil
 }
