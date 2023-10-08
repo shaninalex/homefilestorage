@@ -2,30 +2,37 @@ package main
 
 import (
 	"database/sql"
-	"os"
-	"strconv"
+	"log"
 
 	"github.com/shaninalex/homefilestorage/api"
+	"github.com/shaninalex/homefilestorage/pkg/config"
 	"github.com/shaninalex/homefilestorage/pkg/database"
 )
 
-var (
-	DATABASE_CONNECTION = os.Getenv("DATABASE_CONNECTION")
-	PORT                = os.Getenv("PORT")
-)
-
 func main() {
-	db, err := sql.Open("sqlite3", DATABASE_CONNECTION)
+
+	log.Println("Read config...")
+	// get config path from comand line arguments:
+	// hfsapp --config=/home/user/.local/share/hfsapp/config.toml
+	config, err := config.ParseConfig("/home/user/.local/share/hfsapp/config.toml")
+	if err != nil {
+		panic(err)
+	}
+
+	log.Println("Initialize database...")
+	db, err := sql.Open("sqlite3", config.DB.Path)
 	if err != nil {
 		panic(err)
 	}
 	defer db.Close()
 
 	repo := database.InitSQLiteRepository(db)
-	port, _ := strconv.Atoi(PORT)
-	app, err := api.CreateApi(repo)
+
+	log.Println("Create api...")
+	app, err := api.CreateApi(repo, config)
 	if err != nil {
 		panic(err)
 	}
-	app.Run(port)
+
+	app.Run(config.GIN.Port)
 }
