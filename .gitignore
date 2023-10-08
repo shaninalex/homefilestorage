@@ -3,3 +3,4 @@ config/.env.*
 .env
 
 *.db
+bin/hfs*

@@ -20,8 +20,12 @@ type Config struct {
 		Mode string `toml:"mode"`
 		Port int64  `toml:"port"`
 	} `toml:"gin"`
+	Web struct {
+		Port int64 `toml:"port"`
+	} `toml:"web"`
 }
 
+// TODO: tests for web port
 func ParseConfig(config_path string) (*Config, error) {
 	config, err := toml.LoadFile(config_path)
 	if err != nil {
