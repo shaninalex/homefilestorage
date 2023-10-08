@@ -2,37 +2,27 @@ package api
 
 import (
 	"fmt"
+	"net/http"
 
 	"github.com/gin-gonic/gin"
-	_ "github.com/lib/pq"
-	ory "github.com/ory/kratos-client-go"
-	"github.com/shaninalex/homefilestorage/internal/database"
-	"github.com/shaninalex/homefilestorage/internal/filemanager"
+	"github.com/shaninalex/homefilestorage/pkg/config"
+	"github.com/shaninalex/homefilestorage/pkg/database"
 )
 
 type Api struct {
-	router      *gin.Engine
-	filemanager *filemanager.FileManager
-	database    *database.Database
-	ory         *ory.APIClient
-	kratos_path string
+	router   *gin.Engine
+	database database.Repository
+	config   *config.Config
 }
 
-func CreateApi(filemanager *filemanager.FileManager, database *database.Database, kratos_path string) (*Api, error) {
+func CreateApi(database database.Repository, config *config.Config) (*Api, error) {
 	var api Api
 
+	gin.SetMode(config.GIN.Mode)
 	api.database = database
-	api.filemanager = filemanager
 	api.router = gin.Default()
-	api.kratos_path = kratos_path
+	api.config = config
 
-	configuration := ory.NewConfiguration()
-	configuration.Servers = []ory.ServerConfiguration{
-		{
-			URL: "http://kratos:4433",
-		},
-	}
-	api.ory = ory.NewAPIClient(configuration)
 	api.initializeRoutes()
 
 	return &api, nil
@@ -41,22 +31,19 @@ func CreateApi(filemanager *filemanager.FileManager, database *database.Database
 func (api *Api) initializeRoutes() {
 	api.router.GET("/health", api.AppHealth)
 
-	files := api.router.Group("/files")
-	files.Use(SetUserID())
+	account := api.router.Group("api/v2/account")
 	{
-		files.GET("/:file_id", api.FilesItem)
-		files.GET("/list", api.FilesList)
-		files.POST("/upload", api.FilesUpload)
-	}
-
-	user := api.router.Group("/user")
-	user.Use(SetUserID())
-	{
-		user.GET("/info", api.GetUserInfoBySession)
-		user.GET("/check", api.CheckUserSession)
+		account.GET("/", nil)
+		account.PATCH("/", nil)
+		account.POST("/login", nil)
+		account.GET("/logout", nil)
 	}
 }
 
-func (api *Api) Run(port int) {
+func (api *Api) Run(port int64) {
 	api.router.Run(fmt.Sprintf(":%d", port))
+}
+
+func (api *Api) AppHealth(c *gin.Context) {
+	c.JSON(http.StatusOK, nil)
 }

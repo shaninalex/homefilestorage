@@ -1,0 +1,13 @@
+[db]
+path = "database.db"
+
+[admin]
+email = "email@email.com"
+name = "Test Name"
+
+[storage]
+path = "./storage/"
+
+[gin]
+mode = "release"  # release, debug, test
+port = 8080
