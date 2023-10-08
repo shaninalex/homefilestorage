@@ -1,10 +1,8 @@
-start:
-	docker compose -f ./build/docker-compose.yml up -d --build
+start_api:
+	go run cmd/hfsapp/main.go
 
-down:
-	docker compose -f ./build/docker-compose.yml down 
+start_cli:
+	go run cmd/hfscli/main.go
 
-restart_app:
-	docker compose -f ./build/docker-compose.yml up -d --no-deps --build filemanager
-
-restart: down start
+tests:
+	go test -v ./...

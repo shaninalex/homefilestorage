@@ -1,30 +1,29 @@
 package main
 
 import (
+	"database/sql"
 	"os"
 	"strconv"
 
 	"github.com/shaninalex/homefilestorage/api"
 	"github.com/shaninalex/homefilestorage/pkg/database"
-	"github.com/shaninalex/homefilestorage/pkg/filemanager"
 )
 
 var (
 	DATABASE_CONNECTION = os.Getenv("DATABASE_CONNECTION")
-	FILEMANAGER_PATH    = os.Getenv("FILEMANAGER_PATH")
 	PORT                = os.Getenv("PORT")
 )
 
 func main() {
-	fm := filemanager.Initialize(FILEMANAGER_PATH)
-	db, err := database.CreateConnection(DATABASE_CONNECTION)
+	db, err := sql.Open("sqlite3", DATABASE_CONNECTION)
 	if err != nil {
 		panic(err)
 	}
-	defer db.DB.Close()
+	defer db.Close()
 
+	repo := database.InitSQLiteRepository(db)
 	port, _ := strconv.Atoi(PORT)
-	app, err := api.CreateApi(fm, db)
+	app, err := api.CreateApi(repo)
 	if err != nil {
 		panic(err)
 	}
