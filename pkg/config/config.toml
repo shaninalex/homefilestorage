@@ -9,5 +9,5 @@ name = "Test Name"
 path = "./storage/"
 
 [gin]
-mode = "release"  # release, debug, test
+mode = "debug"  # release, debug, test
 port = 8080
