@@ -5,8 +5,8 @@ import (
 	"strconv"
 
 	"github.com/shaninalex/homefilestorage/api"
-	"github.com/shaninalex/homefilestorage/internal/database"
-	"github.com/shaninalex/homefilestorage/internal/filemanager"
+	"github.com/shaninalex/homefilestorage/pkg/database"
+	"github.com/shaninalex/homefilestorage/pkg/filemanager"
 )
 
 var (

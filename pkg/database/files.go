@@ -1,4 +1,4 @@
-package typedefs
+package database
 
 import "time"
 
@@ -25,10 +25,4 @@ type Folder struct {
 
 func (f *Folder) GetFolderSize() int64 {
 	return 0
-}
-
-type User struct {
-	Email        string `json:"email"`
-	Name         string `json:"name"`
-	PasswordHash string `json:"-"`
 }

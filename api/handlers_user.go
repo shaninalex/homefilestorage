@@ -7,22 +7,11 @@ import (
 	"net/http"
 
 	"github.com/gin-gonic/gin"
-	ory "github.com/ory/kratos-client-go"
 )
 
-func (api *Api) validateSession(r *http.Request) (*ory.Session, error) {
+func (api *Api) validateSession(r *http.Request) (interface{}, error) {
 	cookie, err := r.Cookie("ory_kratos_session")
-	if err != nil {
-		return nil, err
-	}
-	if cookie == nil {
-		return nil, errors.New("no session found in cookie")
-	}
-	resp, _, err := api.ory.FrontendApi.ToSession(context.Background()).Cookie(cookie.String()).Execute()
-	if err != nil {
-		return nil, err
-	}
-	return resp, nil
+	return nil, nil
 }
 
 func (api *Api) GetUserInfoBySession(c *gin.Context) {

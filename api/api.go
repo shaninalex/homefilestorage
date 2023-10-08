@@ -4,8 +4,8 @@ import (
 	"fmt"
 
 	"github.com/gin-gonic/gin"
-	"github.com/shaninalex/homefilestorage/internal/database"
-	"github.com/shaninalex/homefilestorage/internal/filemanager"
+	"github.com/shaninalex/homefilestorage/pkg/database"
+	"github.com/shaninalex/homefilestorage/pkg/filemanager"
 )
 
 type Api struct {

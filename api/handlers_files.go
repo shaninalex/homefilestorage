@@ -8,7 +8,7 @@ import (
 	"strconv"
 
 	"github.com/gin-gonic/gin"
-	"github.com/shaninalex/homefilestorage/internal/typedefs"
+	"github.com/shaninalex/homefilestorage/pkg/typedefs"
 )
 
 func (api *Api) AppHealth(c *gin.Context) {
