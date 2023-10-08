@@ -2,6 +2,8 @@ package main
 
 import (
 	"database/sql"
+	"errors"
+	"flag"
 	"log"
 
 	"github.com/shaninalex/homefilestorage/api"
@@ -11,10 +13,15 @@ import (
 
 func main() {
 
+	configPath := flag.String("config", "", "Config path")
+	flag.Parse()
+
+	if *configPath == "" {
+		panic(errors.New("config path is required"))
+	}
+
 	log.Println("Read config...")
-	// get config path from comand line arguments:
-	// hfsapp --config=/home/user/.local/share/hfsapp/config.toml
-	config, err := config.ParseConfig("/home/user/.local/share/hfsapp/config.toml")
+	config, err := config.ParseConfig(*configPath)
 	if err != nil {
 		panic(err)
 	}
@@ -25,7 +32,6 @@ func main() {
 		panic(err)
 	}
 	defer db.Close()
-
 	repo := database.InitSQLiteRepository(db)
 
 	log.Println("Create api...")
@@ -34,5 +40,6 @@ func main() {
 		panic(err)
 	}
 
+	log.Println("Start server...")
 	app.Run(config.GIN.Port)
 }

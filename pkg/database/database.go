@@ -4,6 +4,7 @@ import (
 	"database/sql"
 
 	"github.com/doug-martin/goqu/v9"
+	_ "github.com/mattn/go-sqlite3"
 )
 
 type Repository interface {
