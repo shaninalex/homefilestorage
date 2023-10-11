@@ -2,7 +2,6 @@ package web
 
 import (
 	"context"
-	"embed"
 	"fmt"
 	"log"
 	"net/http"
@@ -11,16 +10,7 @@ import (
 	"github.com/gorilla/mux"
 	"github.com/shaninalex/homefilestorage/pkg/config"
 	"github.com/shaninalex/homefilestorage/pkg/database"
-)
-
-var (
-	//go:embed resources
-	res   embed.FS
-	pages = map[string]string{
-		"/":      "resources/index.gohtml",
-		"/login": "resources/login.gohtml",
-		"__head": "resources/__head.tmpl",
-	}
+	"github.com/shaninalex/homefilestorage/web/templates"
 )
 
 type WebApp struct {
@@ -28,6 +18,7 @@ type WebApp struct {
 	Config   *config.Config
 	Database database.Repository
 	Router   *mux.Router
+	State    *templates.State
 }
 
 func InitializeWebApp(conf *config.Config, db database.Repository) (*WebApp, error) {
@@ -36,8 +27,8 @@ func InitializeWebApp(conf *config.Config, db database.Repository) (*WebApp, err
 		Config:   conf,
 		Database: db,
 		Router:   mux.NewRouter(),
+		State:    &templates.State{LoggedIn: false},
 	}
-	http.FileServer(http.FS(res))
 	webapp.initializeRoutes()
 	return webapp, nil
 }
@@ -45,12 +36,18 @@ func InitializeWebApp(conf *config.Config, db database.Repository) (*WebApp, err
 func (web *WebApp) Run(port int64) {
 	log.Printf("App started on port %d\n", port)
 	// TODO: csrf token authKey config option
-	csrfMiddleware := csrf.Protect([]byte("32-byte-long-auth-key"))
+	csrfMiddleware := csrf.Protect(
+		[]byte("32-byte-long-auth-key"),
+		csrf.RequestHeader("Authenticity-Token"),
+		csrf.FieldName("authenticity_token"),
+		csrf.SameSite(csrf.SameSiteStrictMode),
+	)
 	web.Router.Use(csrfMiddleware)
 	http.ListenAndServe(fmt.Sprintf(":%d", port), web.Router)
 }
 
 func (web *WebApp) initializeRoutes() {
-	web.Router.HandleFunc("/", web.homeHandler)
-	web.Router.HandleFunc("/login", web.loginHandler)
+	web.Router.HandleFunc("/", web.homeHandler).Methods("GET")
+	web.Router.HandleFunc("/login", web.loginHandler).Methods("POST")
+	web.Router.HandleFunc("/logout", web.logoutHandler).Methods("GET")
 }
