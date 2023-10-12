@@ -33,13 +33,12 @@ func InitializeWebApp(conf *config.Config, db database.Repository) (*WebApp, err
 	if err != nil {
 		return nil, err
 	}
+	go webapp.createAdmin()
 	webapp.initializeRoutes()
 	return webapp, nil
 }
 
 func (web *WebApp) Run(port int64) {
-	log.Printf("App started on port %d\n", port)
-	// TODO: csrf token authKey config option
 	csrfMiddleware := csrf.Protect(
 		[]byte(web.Config.CSRF.CsrfString),
 		csrf.RequestHeader("Authenticity-Token"),
@@ -47,6 +46,8 @@ func (web *WebApp) Run(port int64) {
 		csrf.SameSite(csrf.SameSiteStrictMode),
 	)
 	web.Router.Use(csrfMiddleware)
+
+	log.Printf("App started on port %d\n", port)
 	http.ListenAndServe(fmt.Sprintf(":%d", port), web.Router)
 }
 
@@ -54,4 +55,21 @@ func (web *WebApp) initializeRoutes() {
 	web.Router.HandleFunc("/", web.homeHandler).Methods("GET")
 	web.Router.HandleFunc("/login", web.loginHandler).Methods("POST")
 	web.Router.HandleFunc("/logout", web.logoutHandler).Methods("GET")
+}
+
+func (web *WebApp) createAdmin() error {
+	_, err := web.Database.GetAccountByEmail(web.Config.Admin.Email)
+	if err == nil {
+		// Account exists
+		return nil
+	}
+	_, err = web.Database.CreateAccount(
+		web.Config.Admin.Email,
+		web.Config.Admin.Name,
+		web.Config.Admin.Password,
+	)
+	if err != nil {
+		return err
+	}
+	return nil
 }

@@ -10,8 +10,9 @@ type Config struct {
 		Path string `toml:"path"`
 	} `toml:"db"`
 	Admin struct {
-		Email string `toml:"email"`
-		Name  string `toml:"name"`
+		Email    string `toml:"email"`
+		Name     string `toml:"name"`
+		Password string `toml:"password"`
 	} `toml:"admin"`
 	Storage struct {
 		Path string `toml:"path"`

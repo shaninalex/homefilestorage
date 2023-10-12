@@ -6,7 +6,6 @@ type State struct {
 	Error string
 }
 
-
 templ Login(state State) {
 	<form action="/login" method="POST">
 		<input type="hidden" name="authenticity_token" value={state.CSRFToken} />
