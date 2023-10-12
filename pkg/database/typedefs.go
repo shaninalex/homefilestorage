@@ -1,8 +1,10 @@
 package database
 
 import (
-	"errors"
+	"log"
 	"time"
+
+	"github.com/matthewhartstonge/argon2"
 )
 
 type File struct {
@@ -42,9 +44,23 @@ type Account struct {
 }
 
 func (a *Account) CheckPassword(clear_password string) bool {
+	ok, err := argon2.VerifyEncoded([]byte(clear_password), []byte(a.PasswordHash))
+	if err != nil {
+		log.Println(err)
+		return false
+	}
+	if ok {
+		return true
+	}
 	return false
 }
 
 func (a *Account) HashPassword(clear_password string) error {
-	return errors.New("not implemented")
+	argon := argon2.DefaultConfig()
+	encoded, err := argon.HashEncoded([]byte(clear_password))
+	if err != nil {
+		return err
+	}
+	a.PasswordHash = string(encoded)
+	return nil
 }
