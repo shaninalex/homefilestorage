@@ -4,6 +4,7 @@ path = "database.db"
 [admin]
 email = "email@email.com"
 name = "Test Name"
+password = "password"
 
 [storage]
 path = "./storage/"
