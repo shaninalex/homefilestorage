@@ -114,6 +114,34 @@ func TestSQLiteRepositoryGetAccount(t *testing.T) {
 	}
 }
 
+func TestSQLiteRepositoryGetAccountByEmail(t *testing.T) {
+	db := db_connect()
+	defer db.Close()
+	repo := InitSQLiteRepository(db)
+	repo.Migrate()
+	new_account, err := repo.CreateAccount("test@test.com", "test name", "password")
+	if err != nil {
+		t.Errorf("unable to create account: %s\n", err.Error())
+	}
+
+	account, err := repo.GetAccountByEmail(new_account.Email)
+	if err != nil {
+		t.Errorf("unable to get account: %s\n", err.Error())
+	}
+
+	if account.Email != "test@test.com" {
+		t.Error("account should have \"test@test.com\" email")
+	}
+
+	if account.Name != "test name" {
+		t.Error("account should have \"test name\" name")
+	}
+
+	if account.PasswordHash != "password" {
+		t.Error("account should have \"password\" password")
+	}
+}
+
 func TestSQLiteRepositoryChangeAccount(t *testing.T) {
 	db := db_connect()
 	defer db.Close()

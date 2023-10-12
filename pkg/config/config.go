@@ -23,6 +23,9 @@ type Config struct {
 	Web struct {
 		Port int64 `toml:"port"`
 	} `toml:"web"`
+	CSRF struct {
+		CsrfString string `toml:"csrf_string"`
+	} `toml:"csrf"`
 }
 
 // TODO: tests for web port

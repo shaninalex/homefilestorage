@@ -12,6 +12,7 @@ import "bytes"
 type State struct {
 	LoggedIn  bool
 	CSRFToken string
+	Error     string
 }
 
 func Login(state State) templ.Component {
@@ -44,7 +45,26 @@ func Login(state State) templ.Component {
 		if err != nil {
 			return err
 		}
-		_, err = templBuffer.WriteString("</button></div></form>")
+		_, err = templBuffer.WriteString("</button></div>")
+		if err != nil {
+			return err
+		}
+		if state.Error != "" {
+			_, err = templBuffer.WriteString("<div class=\"alert alert-danger mt-4\" role=\"alert\">")
+			if err != nil {
+				return err
+			}
+			var var_3 string = state.Error
+			_, err = templBuffer.WriteString(templ.EscapeString(var_3))
+			if err != nil {
+				return err
+			}
+			_, err = templBuffer.WriteString("</div>")
+			if err != nil {
+				return err
+			}
+		}
+		_, err = templBuffer.WriteString("</form>")
 		if err != nil {
 			return err
 		}
@@ -65,17 +85,17 @@ func Home(state State) templ.Component {
 			defer templ.ReleaseBuffer(templBuffer)
 		}
 		ctx = templ.InitializeContext(ctx)
-		var_3 := templ.GetChildren(ctx)
-		if var_3 == nil {
-			var_3 = templ.NopComponent
+		var_4 := templ.GetChildren(ctx)
+		if var_4 == nil {
+			var_4 = templ.NopComponent
 		}
 		ctx = templ.ClearChildren(ctx)
 		_, err = templBuffer.WriteString("<!doctype html><html lang=\"en\"><head><meta charset=\"utf-8\"><meta name=\"viewport\" content=\"width=device-width, initial-scale=1\"><title>")
 		if err != nil {
 			return err
 		}
-		var_4 := `Home | HFS`
-		_, err = templBuffer.WriteString(var_4)
+		var_5 := `Home | HFS`
+		_, err = templBuffer.WriteString(var_5)
 		if err != nil {
 			return err
 		}
@@ -88,8 +108,8 @@ func Home(state State) templ.Component {
 			if err != nil {
 				return err
 			}
-			var_5 := `Welcome back!`
-			_, err = templBuffer.WriteString(var_5)
+			var_6 := `Welcome back!`
+			_, err = templBuffer.WriteString(var_6)
 			if err != nil {
 				return err
 			}
@@ -97,8 +117,8 @@ func Home(state State) templ.Component {
 			if err != nil {
 				return err
 			}
-			var_6 := `Logout`
-			_, err = templBuffer.WriteString(var_6)
+			var_7 := `Logout`
+			_, err = templBuffer.WriteString(var_7)
 			if err != nil {
 				return err
 			}
@@ -116,8 +136,8 @@ func Home(state State) templ.Component {
 		if err != nil {
 			return err
 		}
-		var_7 := ``
-		_, err = templBuffer.WriteString(var_7)
+		var_8 := ``
+		_, err = templBuffer.WriteString(var_8)
 		if err != nil {
 			return err
 		}

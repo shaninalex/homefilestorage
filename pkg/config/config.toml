@@ -15,3 +15,8 @@ port = 8080
 
 [web]
 port = 5000
+
+[csrf]
+csrf_string = "8cpX8olZkhNLMr06gPOW+lk98CubyIVur2YgOA+Pg54Mn3fH6lXERiZg"
+# TODO: generete it once on first start?
+# openssl rand -base64 42 

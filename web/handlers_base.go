@@ -13,8 +13,28 @@ func (web *WebApp) homeHandler(w http.ResponseWriter, r *http.Request) {
 }
 
 func (web *WebApp) loginHandler(w http.ResponseWriter, r *http.Request) {
-	// TODO: Actual user login
+	err := r.ParseForm()
+	if err != nil {
+		web.State.Error = "Unable to parse login form"
+		http.Redirect(w, r, "/", http.StatusMovedPermanently)
+		return
+	}
+	v := r.Form
+	email := v.Get("email")
+	password := v.Get("password")
+	account, err := web.Database.GetAccountByEmail(email)
+	if err != nil {
+		web.State.Error = "User not found"
+		http.Redirect(w, r, "/", http.StatusMovedPermanently)
+		return
+	}
+	if !account.CheckPassword(password) {
+		web.State.Error = "Password does not match"
+		http.Redirect(w, r, "/", http.StatusMovedPermanently)
+		return
+	}
 	web.State.LoggedIn = true
+	web.State.Error = ""
 	http.Redirect(w, r, "/", http.StatusMovedPermanently)
 }
 

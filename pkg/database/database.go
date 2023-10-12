@@ -2,6 +2,7 @@ package database
 
 import (
 	"database/sql"
+	"errors"
 
 	"github.com/doug-martin/goqu/v9"
 	_ "github.com/mattn/go-sqlite3"
@@ -10,6 +11,7 @@ import (
 type Repository interface {
 	Migrate() error
 	GetAccount(id int64) (*Account, error)
+	GetAccountByEmail(email string) (*Account, error)
 	CreateAccount(email, name, password string) (*Account, error)
 	ChangeAccount(id int64, user *Account) error
 	SaveFile(file *File) error
@@ -83,6 +85,30 @@ func (db *SQLiteRepository) GetAccount(id int64) (*Account, error) {
 	)
 	if err != nil {
 		return nil, err
+	}
+	return &account, nil
+}
+
+func (db *SQLiteRepository) GetAccountByEmail(email string) (*Account, error) {
+	selectSQL, _, _ := goqu.From("accounts").Select(
+		"id", "name", "email", "password_hash",
+	).Where(
+		goqu.C("email").Eq(email),
+	).ToSQL()
+	var account Account
+	err := db.DB.QueryRow(selectSQL).Scan(
+		&account.ID,
+		&account.Name,
+		&account.Email,
+		&account.PasswordHash,
+	)
+	if err != nil {
+		return nil, err
+	}
+
+	if account.Name == "" {
+		// TODO: tmp
+		return nil, errors.New("user not found")
 	}
 	return &account, nil
 }

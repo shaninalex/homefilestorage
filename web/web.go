@@ -29,6 +29,10 @@ func InitializeWebApp(conf *config.Config, db database.Repository) (*WebApp, err
 		Router:   mux.NewRouter(),
 		State:    &templates.State{LoggedIn: false},
 	}
+	err := db.Migrate()
+	if err != nil {
+		return nil, err
+	}
 	webapp.initializeRoutes()
 	return webapp, nil
 }
@@ -37,7 +41,7 @@ func (web *WebApp) Run(port int64) {
 	log.Printf("App started on port %d\n", port)
 	// TODO: csrf token authKey config option
 	csrfMiddleware := csrf.Protect(
-		[]byte("32-byte-long-auth-key"),
+		[]byte(web.Config.CSRF.CsrfString),
 		csrf.RequestHeader("Authenticity-Token"),
 		csrf.FieldName("authenticity_token"),
 		csrf.SameSite(csrf.SameSiteStrictMode),
