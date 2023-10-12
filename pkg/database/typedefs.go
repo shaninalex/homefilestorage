@@ -1,6 +1,9 @@
 package database
 
-import "time"
+import (
+	"errors"
+	"time"
+)
 
 type File struct {
 	ID         int64     `json:"id,omitempty" db:"id"`
@@ -36,4 +39,12 @@ type Account struct {
 	Email        string `json:"email" db:"email"`
 	Name         string `json:"name" db:"name"`
 	PasswordHash string `json:"-" db:"password_hash"`
+}
+
+func (a *Account) CheckPassword(clear_password string) bool {
+	return false
+}
+
+func (a *Account) HashPassword(clear_password string) error {
+	return errors.New("not implemented")
 }

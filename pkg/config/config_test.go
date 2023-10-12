@@ -26,13 +26,21 @@ func TestConfigParser(t *testing.T) {
 		t.Errorf("Invalid parsing storage path. Got: %s\n", config.Storage.Path)
 	}
 
-	if config.GIN.Mode != "release" {
+	mods := []string{"release", "debug", "test"}
+	if !contains(mods, config.GIN.Mode) {
 		t.Errorf("Invalid parsing gin mode config. Got: %s\n", config.GIN.Mode)
 	}
-
-	// TODO: gin mode can be only "release", "debug" or "test"
 
 	if config.GIN.Port != 8080 {
 		t.Errorf("Invalid parsing gin port config. Got: %d\n", config.GIN.Port)
 	}
+}
+
+func contains(sl []string, name string) bool {
+	for _, value := range sl {
+		if value == name {
+			return true
+		}
+	}
+	return false
 }
