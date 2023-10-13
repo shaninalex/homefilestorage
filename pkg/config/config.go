@@ -22,7 +22,10 @@ type Config struct {
 		Port int64  `toml:"port"`
 	} `toml:"gin"`
 	Web struct {
-		Port int64 `toml:"port"`
+		Port        int64  `toml:"port"`
+		Host        string `toml:"host"`
+		PublicLink  string `toml:"public_link"`
+		SessionName string `toml:"session_name"`
 	} `toml:"web"`
 	CSRF struct {
 		CsrfString string `toml:"csrf_string"`

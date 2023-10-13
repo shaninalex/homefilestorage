@@ -2,7 +2,9 @@ package web
 
 import (
 	"net/http"
+	"time"
 
+	"github.com/google/uuid"
 	"github.com/gorilla/csrf"
 	"github.com/shaninalex/homefilestorage/web/templates"
 )
@@ -33,13 +35,26 @@ func (web *WebApp) loginHandler(w http.ResponseWriter, r *http.Request) {
 		http.Redirect(w, r, "/", http.StatusMovedPermanently)
 		return
 	}
+
+	expires := time.Now().AddDate(1, 0, 0)
+	ck := http.Cookie{
+		Name:     "hfscookie",
+		Value:    uuid.New().String(),
+		Domain:   web.Config.Web.PublicLink,
+		Path:     "/",
+		Expires:  expires,
+		SameSite: 3,
+		HttpOnly: true,
+		Secure:   true,
+	}
+	http.SetCookie(w, &ck)
+
 	web.State.LoggedIn = true
 	web.State.Error = ""
 	http.Redirect(w, r, "/", http.StatusMovedPermanently)
 }
 
 func (web *WebApp) logoutHandler(w http.ResponseWriter, r *http.Request) {
-	// TODO: Actual user logout ( remove user object from state )
 	web.State.LoggedIn = false
-	http.Redirect(w, r, "/", http.StatusMovedPermanently)
+	templates.Home(*web.State).Render(r.Context(), w)
 }

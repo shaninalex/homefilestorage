@@ -6,6 +6,7 @@ require (
 	github.com/a-h/templ v0.2.364
 	github.com/doug-martin/goqu/v9 v9.18.0
 	github.com/gin-gonic/gin v1.9.1
+	github.com/google/uuid v1.3.1
 	github.com/gorilla/csrf v1.7.1
 	github.com/gorilla/mux v1.8.0
 	github.com/matthewhartstonge/argon2 v0.3.4
