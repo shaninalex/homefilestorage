@@ -61,7 +61,7 @@ func (db *SQLiteRepository) Migrate() error {
 		name TEXT NOT NULL,
 		color VARCHAR(10),
 		created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP NOT NULL
-	)
+	);
 	`
 	_, err := db.DB.Exec(scheme)
 	if err != nil {

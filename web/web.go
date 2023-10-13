@@ -63,11 +63,10 @@ func (web *WebApp) createAdmin() error {
 		// Account exists
 		return nil
 	}
-	_, err = web.Database.CreateAccount(
-		web.Config.Admin.Email,
-		web.Config.Admin.Name,
-		web.Config.Admin.Password,
-	)
+
+	account := &database.Account{Name: web.Config.Admin.Name, Email: web.Config.Admin.Email}
+	account.HashPassword(web.Config.Admin.Password)
+	_, err = web.Database.CreateAccount(account.Email, account.Name, account.PasswordHash)
 	if err != nil {
 		return err
 	}
