@@ -10,8 +10,9 @@ type Config struct {
 		Path string `toml:"path"`
 	} `toml:"db"`
 	Admin struct {
-		Email string `toml:"email"`
-		Name  string `toml:"name"`
+		Email    string `toml:"email"`
+		Name     string `toml:"name"`
+		Password string `toml:"password"`
 	} `toml:"admin"`
 	Storage struct {
 		Path string `toml:"path"`
@@ -21,8 +22,15 @@ type Config struct {
 		Port int64  `toml:"port"`
 	} `toml:"gin"`
 	Web struct {
-		Port int64 `toml:"port"`
+		Port        int64  `toml:"port"`
+		Host        string `toml:"host"`
+		PublicLink  string `toml:"public_link"`
+		SessionName string `toml:"session_name"`
+		SecretKey   string `toml:"secret_key"`
 	} `toml:"web"`
+	CSRF struct {
+		CsrfString string `toml:"csrf_string"`
+	} `toml:"csrf"`
 }
 
 // TODO: tests for web port

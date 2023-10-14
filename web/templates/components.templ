@@ -3,19 +3,22 @@ package templates
 type State struct {
 	LoggedIn bool
 	CSRFToken string
+	Error string
 }
-
 
 templ Login(state State) {
 	<form action="/login" method="POST">
 		<input type="hidden" name="authenticity_token" value={state.CSRFToken} />
         <div class="mb-3">
-			<input type="email" name="email" placeholder="Email" class="form-control form-control-sm" />
+			<input type="email" name="email" placeholder="Email" class="form-control form-control-sm" value="email@email.com" />
 		</div>
 		<div class="mb-3">
-			<input type="password" name="password" placeholder="Password" class="form-control form-control-sm" />
+			<input type="password" name="password" placeholder="Password" class="form-control form-control-sm" value="password" />
 		</div>
         <div><button type="submit" class="btn btn-info btn-sm">Login</button></div>
+		if state.Error != "" {
+			<div class="alert alert-danger mt-4" role="alert">{state.Error}</div>
+		}
     </form>
 }
 

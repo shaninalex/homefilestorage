@@ -15,3 +15,12 @@ port = 8080
 
 [web]
 port = 5000
+host = "localhost"
+public_link = "localhost:5000"
+session_name = "hfs_session"
+secret_key = "Gm1UWe/qocoKV9FGHIsy+j0pJFFYMsSUHSCO97XDIpDyudm21PYjPgQ2"
+
+[csrf]
+csrf_string = "8cpX8olZkhNLMr06gPOW+lk98CubyIVur2YgOA+Pg54Mn3fH6lXERiZg"
+# TODO: generete it once on first start?
+# openssl rand -base64 42 
