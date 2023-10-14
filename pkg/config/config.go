@@ -26,6 +26,7 @@ type Config struct {
 		Host        string `toml:"host"`
 		PublicLink  string `toml:"public_link"`
 		SessionName string `toml:"session_name"`
+		SecretKey   string `toml:"secret_key"`
 	} `toml:"web"`
 	CSRF struct {
 		CsrfString string `toml:"csrf_string"`

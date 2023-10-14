@@ -8,6 +8,7 @@ import (
 
 	"github.com/gorilla/csrf"
 	"github.com/gorilla/mux"
+	"github.com/gorilla/sessions"
 	"github.com/shaninalex/homefilestorage/pkg/config"
 	"github.com/shaninalex/homefilestorage/pkg/database"
 	"github.com/shaninalex/homefilestorage/web/templates"
@@ -19,6 +20,7 @@ type WebApp struct {
 	Database database.Repository
 	Router   *mux.Router
 	State    *templates.State
+	Store    *sessions.CookieStore
 }
 
 func InitializeWebApp(conf *config.Config, db database.Repository) (*WebApp, error) {
@@ -28,6 +30,7 @@ func InitializeWebApp(conf *config.Config, db database.Repository) (*WebApp, err
 		Database: db,
 		Router:   mux.NewRouter(),
 		State:    &templates.State{LoggedIn: false},
+		Store:    sessions.NewCookieStore([]byte(conf.Web.SecretKey)),
 	}
 	err := db.Migrate()
 	if err != nil {

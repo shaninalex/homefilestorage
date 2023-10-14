@@ -36,7 +36,7 @@ func Login(state State) templ.Component {
 		if err != nil {
 			return err
 		}
-		_, err = templBuffer.WriteString("\"><div class=\"mb-3\"><input type=\"email\" name=\"email\" placeholder=\"Email\" class=\"form-control form-control-sm\"></div><div class=\"mb-3\"><input type=\"password\" name=\"password\" placeholder=\"Password\" class=\"form-control form-control-sm\"></div><div><button type=\"submit\" class=\"btn btn-info btn-sm\">")
+		_, err = templBuffer.WriteString("\"><div class=\"mb-3\"><input type=\"email\" name=\"email\" placeholder=\"Email\" class=\"form-control form-control-sm\" value=\"email@email.com\"></div><div class=\"mb-3\"><input type=\"password\" name=\"password\" placeholder=\"Password\" class=\"form-control form-control-sm\" value=\"password\"></div><div><button type=\"submit\" class=\"btn btn-info btn-sm\">")
 		if err != nil {
 			return err
 		}

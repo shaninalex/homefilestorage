@@ -2,15 +2,20 @@ package web
 
 import (
 	"net/http"
-	"time"
 
-	"github.com/google/uuid"
 	"github.com/gorilla/csrf"
 	"github.com/shaninalex/homefilestorage/web/templates"
 )
 
 func (web *WebApp) homeHandler(w http.ResponseWriter, r *http.Request) {
 	web.State.CSRFToken = csrf.Token(r)
+	session, _ := web.Store.Get(r, "session.id")
+	authenticated := session.Values["authenticated"]
+	if authenticated != nil && authenticated != false {
+		web.State.LoggedIn = true
+	} else {
+		web.State.LoggedIn = false
+	}
 	templates.Home(*web.State).Render(r.Context(), w)
 }
 
@@ -36,18 +41,9 @@ func (web *WebApp) loginHandler(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	expires := time.Now().AddDate(1, 0, 0)
-	ck := http.Cookie{
-		Name:     "hfscookie",
-		Value:    uuid.New().String(),
-		Domain:   web.Config.Web.PublicLink,
-		Path:     "/",
-		Expires:  expires,
-		SameSite: 3,
-		HttpOnly: true,
-		Secure:   true,
-	}
-	http.SetCookie(w, &ck)
+	session, _ := web.Store.Get(r, "session.id")
+	session.Values["authenticated"] = true
+	session.Save(r, w)
 
 	web.State.LoggedIn = true
 	web.State.Error = ""
@@ -55,6 +51,10 @@ func (web *WebApp) loginHandler(w http.ResponseWriter, r *http.Request) {
 }
 
 func (web *WebApp) logoutHandler(w http.ResponseWriter, r *http.Request) {
+	session, _ := web.Store.Get(r, "session.id")
+	// Set the authenticated value on the session to false
+	session.Values["authenticated"] = false
+	session.Save(r, w)
 	web.State.LoggedIn = false
 	templates.Home(*web.State).Render(r.Context(), w)
 }
