@@ -3,6 +3,7 @@ package database
 import (
 	"database/sql"
 	"errors"
+	"log"
 
 	"github.com/doug-martin/goqu/v9"
 	_ "github.com/mattn/go-sqlite3"
@@ -14,6 +15,7 @@ type Repository interface {
 	GetAccountByEmail(email string) (*Account, error)
 	CreateAccount(email, name, password string) (*Account, error)
 	ChangeAccount(id int64, user *Account) error
+	AllFiles() ([]File, error)
 	SaveFile(file *File) error
 	GetFile(file_id int64) (*File, error)
 	DeleteFile(file_id int64) error
@@ -267,4 +269,41 @@ func (db *SQLiteRepository) DeleteFolder(folder_id int64) error {
 	}
 	return nil
 
+}
+func (db *SQLiteRepository) AllFiles() ([]File, error) {
+	selectSQL, _, _ := goqu.From("files").Select(
+		"id",
+		"name",
+		"mime_type",
+		"size",
+		"system_path",
+		"folder_id",
+		"created_at",
+	).ToSQL()
+
+	var files []File
+	rows, err := db.DB.Query(selectSQL)
+	if err != nil {
+		return nil, err
+	}
+
+	for rows.Next() {
+		var file File
+		err := rows.Scan(
+			&file.ID,
+			&file.Name,
+			&file.MimeType,
+			&file.Size,
+			&file.SystemPath,
+			&file.FolderId,
+			&file.CreatedAt,
+		)
+		if err != nil {
+			log.Println(err)
+		} else {
+			files = append(files, file)
+		}
+	}
+
+	return files, nil
 }

@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"log"
 	"net/http"
+	"os"
 
 	"github.com/gorilla/csrf"
 	"github.com/gorilla/mux"
@@ -37,6 +38,7 @@ func InitializeWebApp(conf *config.Config, db database.Repository) (*WebApp, err
 		return nil, err
 	}
 	go webapp.createAdmin()
+	go webapp.createStorageFolder()
 	webapp.initializeRoutes()
 	return webapp, nil
 }
@@ -58,6 +60,8 @@ func (web *WebApp) initializeRoutes() {
 	web.Router.HandleFunc("/", web.homeHandler).Methods("GET")
 	web.Router.HandleFunc("/login", web.loginHandler).Methods("POST")
 	web.Router.HandleFunc("/logout", web.logoutHandler).Methods("GET")
+	web.Router.HandleFunc("/files/upload", web.filesUploadHandler).Methods("POST")
+	web.Router.HandleFunc("/files/{id:[0-9]+}", web.filesGetHandler).Methods("GET")
 }
 
 func (web *WebApp) createAdmin() error {
@@ -74,4 +78,11 @@ func (web *WebApp) createAdmin() error {
 		return err
 	}
 	return nil
+}
+
+func (web *WebApp) createStorageFolder() {
+	err := os.MkdirAll(web.Config.Storage.Path, os.ModePerm)
+	if err != nil {
+		panic(err)
+	}
 }

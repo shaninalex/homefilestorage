@@ -13,6 +13,9 @@ func (web *WebApp) homeHandler(w http.ResponseWriter, r *http.Request) {
 	authenticated := session.Values["authenticated"]
 	if authenticated != nil && authenticated != false {
 		web.State.LoggedIn = true
+		web.State.ActiveRoute = "files"
+		files, _ := web.Database.AllFiles()
+		web.State.Files = files
 	} else {
 		web.State.LoggedIn = false
 	}

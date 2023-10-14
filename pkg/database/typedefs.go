@@ -1,6 +1,7 @@
 package database
 
 import (
+	"fmt"
 	"log"
 	"time"
 
@@ -17,16 +18,22 @@ type File struct {
 	CreatedAt  time.Time `json:"created_at,omitempty" db:"created_at"`
 }
 
-func (f *File) GetFileSize() int64 {
-	return 0
-}
-
-func (f *File) GetMimeType() int64 {
-	return 0
-}
-
 func (f *File) FormatTime() string {
 	return f.CreatedAt.Format("2006.01.02 15:04:05")
+}
+
+func (f *File) FormatSize() string {
+	if f.Size < 1024 {
+		return fmt.Sprintf("%.1f Kb", float64(f.Size)/1024)
+	} else if f.Size < 1024*1024*1024 {
+		return fmt.Sprintf("%.1f Mb", float64(f.Size)/(1024*1024))
+	} else {
+		return fmt.Sprintf("%.1f Gb", float64(f.Size)/(1024*1024*1024))
+	}
+}
+
+func (f *File) DownloadPath() string {
+	return fmt.Sprintf("/files/%d", f.ID)
 }
 
 type Folder struct {

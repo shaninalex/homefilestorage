@@ -15,3 +15,7 @@ start_cli:
 
 tests:
 	go test -v ./...
+
+templates:
+	~/go/bin/templ generate -f web/templates/base.templ
+	~/go/bin/templ generate -f web/templates/dashboard.templ
