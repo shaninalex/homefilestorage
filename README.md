@@ -2,7 +2,13 @@
 
 ## Note!
 
-It's my infinite pet-project. Here I'm not actualy developming filestorage... This is sandbox where I test different approaches in software development. And filestorage is just super complex todo app where I just solving some common tasks - access management, performance, comunications between services and so on... So here I can make some mistakes. If you realy need some self hosted filestorage look at Nextcloud or ownCloud. Or if you curious person as I'm - please feel free to contribute!
+If you realy need some self hosted filestorage look at Nextcloud or OwnCloud. Or if you curious person as I'm - please feel free to contribute!
+
+The main idea is to create single file executable with admin dashboard, api and cli homefilestorage. Why it's "home" file storage. Because this project will host on Raspberry pi device and work in home network. Why single file executable? It's easy to deploy and setup. Config file is easy to read toml file.
+
+## Status
+
+It's under development and does contain some mistakes, does not have enaugh tests etc.
 
 ## Docs
 
@@ -11,16 +17,9 @@ Developer documentation and tasks will be soon.
 ### Start
 
 ```bash
-$ make restart
+$ make start_web
 ```
 
-## Front end app
+## TODO:
 
-[Homefilestorage frontend](https://github.com/shaninalex/homefilestorage-frontend)
-
-
-```bash
-$ npm run start
-```
-
-Make sure that IP (or ULR ) in proxy.conf.json is the same as oathkeeper
+Development process: https://github.com/users/shaninalex/projects/5
