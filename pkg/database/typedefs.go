@@ -33,7 +33,11 @@ func (f *File) FormatSize() string {
 }
 
 func (f *File) DownloadPath() string {
-	return fmt.Sprintf("/files/%d", f.ID)
+	return fmt.Sprintf("/files/%d/download", f.ID)
+}
+
+func (f *File) PreviewPath() string {
+	return fmt.Sprintf("/files/%d/preview", f.ID)
 }
 
 type Folder struct {

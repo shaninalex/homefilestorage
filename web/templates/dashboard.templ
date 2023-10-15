@@ -1,7 +1,9 @@
 package templates
  
 import (
+    "fmt"
     "strconv"
+    "github.com/shaninalex/homefilestorage/pkg/database"
 )
 
 templ Dashboard(state State) {
@@ -50,8 +52,8 @@ templ FilesFormUpload(state State) {
     <form action="/files/upload" enctype="multipart/form-data" method="post" 
         class="mb-3 d-flex justify-content-between align-items-center gap-3">
         <input type="hidden" name="authenticity_token" value={state.CSRFToken} />
-        <input name="files" class="form-control" type="file" multiple />
-        <button class="btn btn-primary">Upload</button>
+        <input name="files" class="form-control" type="file" multiple required/>
+        <button type="submit" class="btn btn-primary">Upload</button>
     </form>
     if state.Error != "" {
         <div class="alert alert-danger mt-4" role="alert">{state.Error}</div>
@@ -59,24 +61,38 @@ templ FilesFormUpload(state State) {
 }
 
 templ FilesList(state State) {
-    <table class="table">
-        <thead>
-            <tr>
-            <th scope="col">id</th>
-            <th scope="col">Name</th>
-            <th scope="col">Size</th>
-            <th scope="col">Created at</th>
-            </tr>
-        </thead>
-        <tbody>
-            for _, file := range state.Files {
-                <tr>
-                    <th scope="row">{strconv.FormatInt(file.ID, 10)}</th>
-                    <td><a href={templ.URL(file.DownloadPath())}>{file.Name}</a></td>
-                    <td>{file.FormatSize()}</td>
-                    <td>{file.FormatTime()}</td>
-                </tr>
-            }
-        </tbody>
-    </table>
+    <div class="row">
+        for _, file := range state.Files {
+            @FileItem(file, state)
+        }
+    </div>
+}
+
+templ FileItem(file database.File, state State) {
+    <div class="col-md-4">
+        <div class="card mb-3">
+            <div class="card-header text-body-secondary">
+                <a href={templ.URL(file.PreviewPath())}>{file.Name}</a> (<b>ID: {strconv.FormatInt(file.ID, 10)}</b>)
+            </div>
+            <div class="card-body">
+                SIZE: {file.FormatSize()} <br />
+                Created at: {file.FormatTime()}
+            </div>
+            <div class="card-footer text-body-secondary">
+                <div class="d-flex gap-3">
+                    <a class="btn btn-primary btn-sm btn-default" 
+                        href={templ.URL(file.DownloadPath())}>
+                        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-download" viewBox="0 0 16 16">
+                            <path d="M.5 9.9a.5.5 0 0 1 .5.5v2.5a1 1 0 0 0 1 1h12a1 1 0 0 0 1-1v-2.5a.5.5 0 0 1 1 0v2.5a2 2 0 0 1-2 2H2a2 2 0 0 1-2-2v-2.5a.5.5 0 0 1 .5-.5z"/>
+                            <path d="M7.646 11.854a.5.5 0 0 0 .708 0l3-3a.5.5 0 0 0-.708-.708L8.5 10.293V1.5a.5.5 0 0 0-1 0v8.793L5.354 8.146a.5.5 0 1 0-.708.708l3 3z"/>
+                        </svg>
+                    </a>
+                    <form action={fmt.Sprintf("/files/%d/delete", file.ID)} method="POST">
+                        <input type="hidden" name="authenticity_token" value={state.CSRFToken} />
+                        <button type="submit" class="btn btn-primary btn-sm btn-danger">X</button>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
 }

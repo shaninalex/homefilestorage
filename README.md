@@ -17,7 +17,7 @@ Developer documentation and tasks will be soon.
 ### Start
 
 ```bash
-$ make start_web
+$ make start
 ```
 
 ## TODO:
