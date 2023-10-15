@@ -6,3 +6,5 @@ config/.env.*
 bin/hfs*
 
 storage/
+
+test.txt
