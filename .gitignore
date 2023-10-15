@@ -3,7 +3,7 @@ config/.env.*
 .env
 
 *.db
-bin/hfs*
+bin/homestorage
 
 storage/
 

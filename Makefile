@@ -2,13 +2,10 @@ start:
 	go run cmd/homestorage/main.go -config=./pkg/config/config.toml
 
 build:
-	go build -o ./bin/homestorage cmd/homestorage/main.go
+	env GOOS=linux GOARCH=arm CGO_ENABLED=1 go build -tags=sqlite_omit_load_extension -o ./bin/homestorage cmd/homestorage/main.go
 
 start_web_prod:
-	./bin/hfsweb -config=./pkg/config/config.toml
-
-start_cli:
-	go run cmd/hfscli/main.go
+	./bin/homestorage -config=./pkg/config/config.toml
 
 tests:
 	go test -v ./...
