@@ -26,21 +26,27 @@ func TestConfigParser(t *testing.T) {
 		t.Errorf("Invalid parsing storage path. Got: %s\n", config.Storage.Path)
 	}
 
-	mods := []string{"release", "debug", "test"}
-	if !contains(mods, config.GIN.Mode) {
-		t.Errorf("Invalid parsing gin mode config. Got: %s\n", config.GIN.Mode)
+	if config.Web.Port != 5000 {
+		t.Errorf("Invalid parsing web port. Got: %d\n", config.Web.Port)
 	}
 
-	if config.GIN.Port != 8080 {
-		t.Errorf("Invalid parsing gin port config. Got: %d\n", config.GIN.Port)
+	if config.Web.Host != "localhost" {
+		t.Errorf("Invalid parsing web host. Got: %s\n", config.Web.Host)
 	}
-}
 
-func contains(sl []string, name string) bool {
-	for _, value := range sl {
-		if value == name {
-			return true
-		}
+	if config.Web.PublicLink != "localhost:5000" {
+		t.Errorf("Invalid parsing web public link. Got: %s\n", config.Web.PublicLink)
 	}
-	return false
+
+	if config.Web.SessionName != "hfs_session" {
+		t.Errorf("Invalid parsing web session name. Got: %s\n", config.Web.SessionName)
+	}
+
+	if config.Web.SecretKey != "test-secret-key" {
+		t.Errorf("Invalid parsing web secret name. Got: %s\n", config.Web.SecretKey)
+	}
+
+	if config.CSRF.CsrfString != "test-csrf-string" {
+		t.Errorf("Invalid parsing csrf string. Got: %s\n", config.CSRF.CsrfString)
+	}
 }

@@ -17,10 +17,6 @@ type Config struct {
 	Storage struct {
 		Path string `toml:"path"`
 	} `toml:"storage"`
-	GIN struct {
-		Mode string `toml:"mode"`
-		Port int64  `toml:"port"`
-	} `toml:"gin"`
 	Web struct {
 		Port        int64  `toml:"port"`
 		Host        string `toml:"host"`
